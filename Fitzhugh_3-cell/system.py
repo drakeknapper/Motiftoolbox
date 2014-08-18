@@ -6,7 +6,9 @@ sys.path.insert(0, '../Tools')
 import window as win
 import fitzhugh as model
 import tools as tl
+import network as net
 import numpy as np
+import pylab as pl
 
 
 def set_params(**kwargs):
@@ -29,43 +31,43 @@ class system(win.window):
 	title = "System"
 	figsize = (6, 5)
 
-	def __init__(self, info=None, position=None):
+	def __init__(self, info=None, position=None, network=None):
 		win.window.__init__(self, position)
 
 		self.x_orbit, self.y_orbit, self.orbit_period = None, None, None
 		self.dt = 0.1
 		self.stride = 30
 		self.info = info
+		self.network = network
 
-		self.ax = self.fig.add_subplot(111, yticks=[-1.5, -0.5, 0.5, 1.5])
+		self.ax = self.fig.add_subplot(111, yticks=[-1.5, -0.5, 0.5, 1.5], xticks=[0, 0.5, 1.0])
 		self.ax.set_xlim(0., 1.)
 		self.x_min, self.x_max = -1.5, 1.5
 		self.ax.set_ylim(self.x_min, self.x_max)
-		self.ax.set_xlabel(r'state $y$', fontsize=15)
-		self.ax.set_ylabel(r'state $x$', fontsize=15)
+		self.ax.set_ylabel(r'Membrane Voltage $V$ (a.u.)', fontsize=18)
+		self.ax.set_xlabel(r'Inactivation $x$', fontsize=18)
+                self.ax.set_title('Single-Cell Dynamics (+coupling)', fontsize=18)
 
-		self.li_traj, = self.ax.plot([], [], 'k-', lw=2.)
-		self.li_ncl_x, = self.ax.plot([], [], 'y--', lw=2.)
-		self.li_ncl_y, = self.ax.plot([], [], 'm--', lw=2.)
+		self.li_traj, = self.ax.plot([], [], 'g-', lw=1., label='Oscillation Cycle')
+		self.li_ncl_y, = self.ax.plot([], [], 'b--', lw=2., label='nullcline $\dot{V}=0$')
+		self.li_ncl_x, = self.ax.plot([], [], 'g--', lw=2., label='nullcline $\dot{x}=0$')
+		self.li_sft_ncl_x, = self.ax.plot([], [], 'r-.', lw=2., label='with coupling')
 		self.tx_state_space = self.ax.text(0.2, -0.5, '', color='r')
 
+                #pl.legend(loc=0, prop=dict(size=18))
 		self.refresh_nullclines()
 		self.refresh_orbit()
 
 		self.key_func_dict.update(dict(C=system.set_params))
-
-		self.fig.canvas.mpl_connect('button_press_event', self.on_button)
+		
+                self.fig.canvas.mpl_connect('button_press_event', self.on_button)
 		self.fig.canvas.mpl_connect('button_release_event', self.off_button)
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
 
 
 	def focus_in(self, event=None):
-		descriptor = "System Parameters :\n I_0 = %lf \n x_0 = %lf \n epsilon_0 = %lf \n k_0 = %lf \n m_0 = %lf\n\n" % (model.params['I_0'], model.params['x_0'], model.params['epsilon_0'], model.params['k_0'], model.params['m_0'])
-		descriptor += "'C': change parameters\n"
-		descriptor += "right mouse: nullcline position\n"
-		descriptor += "left mouse: nullcline shape\n"
-		descriptor += "middle mouse: time scale"
-
+		descriptor = "System Parameters :\n I_0 = %lf \n x_0 = %lf \n epsilon_0 = %lf \n k_0 = %lf \n m_0 = %lf" % (model.params['I_0'], model.params['x_0'], model.params['epsilon_0'], model.params['k_0'], model.params['m_0'])
+                descriptor += "\n\n'C': change parameters"
 		if self.info == None:
 			print descriptor
 
@@ -96,9 +98,8 @@ class system(win.window):
 		print "=======SET PARAMS======="
 		self.refresh_nullclines()
 		self.refresh_orbit()
-
-
-
+	
+	
 	def load_initial_condition(self, x, y): # only one phase:  everything's square!
 		X = np.zeros((model.N_EQ3), float)
 		phi_x, phi_y = tl.PI2*(1.-x), tl.PI2*(1.-y)
@@ -128,6 +129,17 @@ class system(win.window):
 		x_i = np.arange(self.x_min, self.x_max, 0.01)
 		self.li_ncl_x.set_data(model.nullcline_x(x_i, model.params['I_0'], model.params['m_0']), x_i)
 		self.li_ncl_y.set_data(model.nullcline_y(x_i, model.params['x_0'], model.params['k_0']), x_i)
+
+		if not self.network == None:
+			g = self.network.coupling_strength
+
+			if all((g[0] == g_i for g_i in g)):
+				self.li_sft_ncl_x.set_data(model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'], model.params['E_0'], g[0]), x_i)
+
+			else:
+				self.li_sft_ncl_x.set_data([], [])
+			
+
 		self.fig.canvas.draw()
 
 
@@ -162,12 +174,12 @@ class system(win.window):
 			set_params(I=model.params['I_0']+delta_params[0], x=model.params['x_0']+delta_params[1])
 
 		elif event.button == 2:
-			new_eps = model.params['epsilon_0']+delta_params[0]
-			set_params(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps)
+			new_m = model.params['m_0']+delta_params[0]
+			set_params(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m)
 			
 		elif event.button == 3:
-			new_m = model.params['m_0']+delta_params[0]
-			set_params(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m, k=model.params['k_0']+delta_params[1]*3.)
+			new_eps = model.params['epsilon_0']+delta_params[0]
+			set_params(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps, k=model.params['k_0']+delta_params[1]*3.)
 			
 		self.refresh_nullclines()
 		self.refresh_orbit()

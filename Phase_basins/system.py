@@ -29,7 +29,7 @@ set_params(epsilon=0.3)
 class system(win.window):
 
 	title = "System"
-	figsize = (12, 10)
+	figsize = (6, 5)
 
 	def __init__(self, info=None, position=None, network=None):
 		win.window.__init__(self, position)
@@ -54,18 +54,20 @@ class system(win.window):
 		self.li_sft_ncl_x, = self.ax.plot([], [], 'r-.', lw=2., label='with coupling')
 		self.tx_state_space = self.ax.text(0.2, -0.5, '', color='r')
 
-                pl.legend(loc=0, prop=dict(size=18))
+                #pl.legend(loc=0, prop=dict(size=18))
 		self.refresh_nullclines()
 		self.refresh_orbit()
 
-		self.fig.canvas.mpl_connect('button_press_event', self.on_button)
+		self.key_func_dict.update(dict(C=system.set_params))
+		
+                self.fig.canvas.mpl_connect('button_press_event', self.on_button)
 		self.fig.canvas.mpl_connect('button_release_event', self.off_button)
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
 
 
 	def focus_in(self, event=None):
 		descriptor = "System Parameters :\n I_0 = %lf \n x_0 = %lf \n epsilon_0 = %lf \n k_0 = %lf \n m_0 = %lf" % (model.params['I_0'], model.params['x_0'], model.params['epsilon_0'], model.params['k_0'], model.params['m_0'])
-
+                descriptor += "\n\n'C': change parameters"
 		if self.info == None:
 			print descriptor
 
@@ -73,6 +75,31 @@ class system(win.window):
 			self.info.set(descriptor)
 
 
+	def set_params(self):
+
+		print "\n=======SET PARAMS======="
+		print "Enter new parameter value. (If you don't want to change a parameter, simply hit enter.)"
+
+		new_params = dict()
+
+		for p in model.params.keys():
+			[p_name, n_osci] = p.split('_')
+
+			if n_osci == '0':
+
+				try:
+					p_new = float(raw_input("%s = " % p_name))
+					new_params[p_name] = p_new
+
+				except:
+					pass
+		
+		set_params(**new_params)
+		print "=======SET PARAMS======="
+		self.refresh_nullclines()
+		self.refresh_orbit()
+	
+	
 	def load_initial_condition(self, x, y): # only one phase:  everything's square!
 		X = np.zeros((model.N_EQ3), float)
 		phi_x, phi_y = tl.PI2*(1.-x), tl.PI2*(1.-y)
