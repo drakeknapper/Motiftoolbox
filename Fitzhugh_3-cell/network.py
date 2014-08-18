@@ -32,7 +32,6 @@ coupling2text[1] = 4
 coupling2text[4] = 5
 N_TEXTS = len(text2coupling)
 
-
 def set_params(**kwargs):
 
 	if len(kwargs) == 0:
@@ -46,17 +45,17 @@ def set_params(**kwargs):
 	print '# update params', kwargs
 
 
-
 class network(win.window):
 
 	title = "Network"
 	figize = (5, 3)
 
-	def __init__(self, g_inh=0.001, info=None, position=None):
+	def __init__(self, g_inh=0.001, info=None, position=None, system=None):
 		win.window.__init__(self, position)
 		self.coupling_strength = g_inh*np.ones((6), float)
 		self.COUPLING_LOCKED = True
 		self.info = info
+		self.system = system
 
 		self.ax = self.fig.add_axes([-0.12, -0.1, 1.1, 1.33])
 		tl.three_cells_alt(self.coupling_strength, ax=self.ax)
@@ -91,6 +90,8 @@ class network(win.window):
 		for i in xrange(N_TEXTS):
 			self.ax.texts[i].set_text('%.4f' % c[text2coupling[i]]) # 1 -> 2
 
+		if not self.system == None:
+			self.system.refresh_nullclines()
 		self.fig.canvas.draw()
 
 
@@ -121,10 +122,8 @@ class network(win.window):
 		else:
 			new_coupling = self.coupling_strength+delta
 			self.coupling_strength = (new_coupling>0.)*new_coupling
-			self.show_coupling()
-
-
-
+		
+                self.show_coupling()
 		self.fig.canvas.draw()
 
 
