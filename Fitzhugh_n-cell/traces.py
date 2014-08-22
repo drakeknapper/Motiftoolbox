@@ -73,7 +73,7 @@ class traces(win.window):
 
 		if event.inaxes == self.ax:
 
-		        self.params = model.parameters_one()
+		        self.params = model.parameters_n()
 		        self.g_inh = model.params['g_inh_0']
 
 		        length = self.system.N_output(self.CYCLES)
@@ -104,7 +104,7 @@ class traces(win.window):
 
 	def compute_step(self, idx):
 
-		self.params = model.parameters_one()
+		self.params = model.parameters_n()
 		self.g_inh = model.params['g_inh_0']
 
 		model.step_n_em(
