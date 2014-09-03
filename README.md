@@ -10,6 +10,12 @@ This is Motiftoolbox, a set of versatile tools to explore the dynamics of networ
 INSTALL # Install # install
 -------------------------------------------
 
+Packages needed:
+> Pylab for python
+> g++ compiler
+> NVCC cuda compiler (if using GPU features)
+
+
 -------------------------------------------
 LINUX
 -------------------------------------------
