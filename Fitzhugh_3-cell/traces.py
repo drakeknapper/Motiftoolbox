@@ -14,15 +14,14 @@ import pylab as pl
 class traces(win.window):
 
 	title = 'Voltage Traces'
-	figsize = (6, 2)
+	figsize = (9, 2)
 
-	def __init__(self, phase_potrait, network, info=None, position=None):
+	def __init__(self, system, network, info=None, position=None):
 		win.window.__init__(self, position)
-		self.system = phase_potrait
+		self.system = system
 		self.network = network
 		self.info = info
 		self.CYCLES = 10
-		self.initial_condition = self.system.load_initial_condition(pl.rand(), pl.rand())
 
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 
@@ -40,28 +39,27 @@ class traces(win.window):
 
 		#self.fig.tight_layout()
 
-		self.key_func_dict = dict(u=traces.increase_cycles, i=traces.decrease_cycles)
+		self.key_func_dict = dict(u=traces.increaseCycles, i=traces.decreaseCycles)
 		self.fig.canvas.mpl_connect('key_press_event', self.on_key)
-		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
+		self.fig.canvas.mpl_connect('axes_enter_event', self.focusIn)
+
+		self.computeTraces()
 
 
-	def adjust_cycles(self, adjustment):
-		self.CYCLES = adjustment.value
-		self.compute_traces()
-
-	
-	def increase_cycles(self):
-		self.CYCLES += 1
-		self.compute_traces()
-		self.focus_in()
-
-	def decrease_cycles(self):
-		self.CYCLES -= 1*(self.CYCLES > 0)
-		self.compute_traces()
-		self.focus_in()
+	def adjustCycles(self, adjustment):
+		self.CYCLES = adjustment
+		self.computeTraces()
+		self.focusIn()
 
 
-	def focus_in(self, event=None):
+	def increaseCycles(self):
+		adjustCycles( self.CYCLES + 1 )
+
+	def decreaseCycles(self):
+		adjustCycles( self.CYCLES - 1*(self.CYCLES > 0) )
+
+
+	def focusIn(self, event=None):
 		descriptor = "CYCLES : "+str(self.CYCLES)+" ('u' > 'i')"
 
 		if self.info == None:
@@ -80,10 +78,10 @@ class traces(win.window):
 			self.key_func_dict[event.key] = lambda x: None
 
 
-	def compute_traces(self, initial_condition=None, plotit=True):
+	def computeTraces(self, initial_condition=None, plotit=True):
 
 		if initial_condition == None:
-			initial_condition = self.initial_condition
+			initial_condition = self.system.load_initial_condition(pl.rand(), pl.rand())
 
 		V_i = fh.integrate_three_rk4(
 				initial_condition,

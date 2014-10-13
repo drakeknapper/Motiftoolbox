@@ -25,6 +25,10 @@ threshold_slope = 100.          # coupling threshold slope
 
 params = dict(I_0=0.4, k_0=10., x_0=0., epsilon_0=0.05, E_0=-1.5, m_0=1., sigma_0=0.)
 
+description = dict(I="External current", k="K+ activation slope",
+			x="K+ activation shift", epsilon="time scale", E="Inh. reversal potential",
+                        m="K+ current scale", sigma="noise amplitude")
+
 params['I_b'] = params['I_0'] #
 params['epsilon_b'] = params['epsilon_0'] #
 params['x_b'] = params['x_0'] #

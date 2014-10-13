@@ -21,17 +21,16 @@ class traces(win.window):
 	title = 'Membrane Voltage Traces (Oscilloscope)'
 	figsize = (16, 4)
 
-	def __init__(self, phase_potrait, network, info=None, position=None):
+	def __init__(self, system, network, info=None, position=None):
 		win.window.__init__(self, position)
-		self.system = phase_potrait
+		self.system = system
 		self.network = network
 		self.info = info
 		self.CYCLES = 8
-		self.state = np.array([0., 1., 0., 0., 1., 0., 0., 1., 0.])
-		self.running = False
-		self.pause = False
-		self.pulsed = 0
+		self.state = system.load_initial_condition( pl.rand(), pl.rand() )
 		self.initial_condition = self.system.load_initial_condition(pl.rand(), pl.rand())
+		self.running = False
+		self.pulsed = 0
 
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 
@@ -54,7 +53,7 @@ class traces(win.window):
 
 	def adjust_cycles(self, adjustment):
 		self.CYCLES = adjustment
-		self.compute_traces()
+		self.computeTraces()
 		self.focus_in()
 
 	
@@ -76,7 +75,7 @@ class traces(win.window):
 
 	def on_click(self, event):
 
-		if event.inaxes == self.ax:
+		if event.inaxes == self.ax and self.running == False:
 
 		        self.params = model.params_three()
 		        self.coupling = np.zeros((9), float)
@@ -98,6 +97,8 @@ class traces(win.window):
 
                         self.anim = animation.FuncAnimation(self.fig, self.compute_step, init_func=self.init, frames=self.trajectory.shape[0], interval=0, blit=True, repeat=False)
 
+			self.running = True
+
 
 
         def init(self):
@@ -110,8 +111,6 @@ class traces(win.window):
 
 
 	def compute_step(self, idx):
-
-
 
 		model.step_three_rk4(
 			self.state, self.params, self.coupling,
@@ -129,6 +128,9 @@ class traces(win.window):
 		self.li_g.set_data(self.t, self.trajectory[:, 1]-0.06)
 		self.li_r.set_data(self.t, self.trajectory[:, 2]-0.12)
 
+		if idx == self.trajectory.shape[0]-1:
+			self.running = False
+		
                 return self.li_b, self.li_g, self.li_r
 
 
@@ -136,7 +138,7 @@ class traces(win.window):
 
 
 
-	def compute_traces(self, initial_condition=None, plotit=True):
+	def computeTraces(self, initial_condition=None, plotit=True):
 
 		if initial_condition == None:
 			initial_condition = self.initial_condition
