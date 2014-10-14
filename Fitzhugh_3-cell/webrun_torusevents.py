@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 import matplotlib.pyplot as plt, mpld3 as m
 from mpld3 import plugins,utils
 from flask import Flask,request
