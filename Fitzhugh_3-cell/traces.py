@@ -40,7 +40,6 @@ class traces(win.window):
 		#self.fig.tight_layout()
 
 		self.key_func_dict = dict(u=traces.increaseCycles, i=traces.decreaseCycles)
-		self.fig.canvas.mpl_connect('key_press_event', self.on_key)
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focusIn)
 
 		self.computeTraces()
@@ -53,10 +52,10 @@ class traces(win.window):
 
 
 	def increaseCycles(self):
-		adjustCycles( self.CYCLES + 1 )
+		self.adjustCycles(self.CYCLES+1)
 
 	def decreaseCycles(self):
-		adjustCycles( self.CYCLES - 1*(self.CYCLES > 0) )
+		self.adjustCycles(self.CYCLES-1*(self.CYCLES>0))
 
 
 	def focusIn(self, event=None):
