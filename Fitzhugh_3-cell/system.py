@@ -166,7 +166,7 @@ class system(win.window):
 
 
 	def on_button(self, event):
-			self.event_start = np.array([event.xdata, event.ydata])
+		self.event_start = np.array([event.xdata, event.ydata])
 
 
 	def N_output(self, CYCLES):
@@ -179,13 +179,13 @@ class system(win.window):
 		if event.button == 1:
 			setParams(I=model.params['I_0']+delta_params[0], x=model.params['x_0']+delta_params[1])
 
-		elif event.button == 2:
-			new_m = model.params['m_0']+delta_params[0]
-			setParams(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m)
-			
 		elif event.button == 3:
+			new_m = model.params['m_0']+delta_params[0]
+			setParams(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m, k=model.params['k_0']+delta_params[1]*3.)
+			
+		elif event.button == 2:
 			new_eps = model.params['epsilon_0']+delta_params[0]
-			setParams(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps, k=model.params['k_0']+delta_params[1]*3.)
+			setParams(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps)
 			
 		self.refresh_nullclines()
 		self.refresh_orbit()
