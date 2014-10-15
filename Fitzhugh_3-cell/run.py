@@ -25,6 +25,7 @@ n = netw.network(info=i, position=pos_net)
 s = sys.system(info=i, position=pos_sys, network=n)
 n.system = s
 t = tra.traces(s, n, info=i, position=pos_tra)
+s.traces = t
 tor = tor.torus(s, n, t, info=i, position=pos_torus)
 
 if pl.get_backend() == 'TkAgg':
