@@ -50,7 +50,7 @@ class network(win.window):
 	title = "Network"
 	figize = (5, 3)
 
-	def __init__(self, g_inh=0.001, info=None, position=None, system=None):
+	def __init__(self, g_inh=0.005, info=None, position=None, system=None):
 		win.window.__init__(self, position)
 		self.coupling_strength = g_inh*np.ones((6), float)
 		self.COUPLING_LOCKED = True

@@ -57,7 +57,7 @@ class torus_2D(win.window):
 
 
 	def click_traces(self, x, y):
-		t, V_j = self.traces.compute_traces(self.system.load_initial_condition(x, y))
+		t, V_j = self.traces.computeTraces(self.system.load_initial_condition(x, y))
 		V_j = np.transpose(V_j)
 		ti, d = tl.phase_difference(V_j, V_trigger=type(self).V_trigger)
 		last = d[-1, :]
@@ -206,7 +206,7 @@ class torus_2D(win.window):
 		# refine attractor
 		#"""
 		def refine_attractor(initial_condition):
-			t, V_j = self.traces.compute_traces(initial_condition, plotit=False)
+			t, V_j = self.traces.computeTraces(initial_condition, plotit=False)
 			V_j = np.transpose(V_j)
 			ti, trajectory = tl.phase_difference(V_j, V_trigger=type(self).V_trigger)
 

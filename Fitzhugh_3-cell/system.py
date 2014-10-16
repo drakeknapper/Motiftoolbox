@@ -11,7 +11,7 @@ import numpy as np
 import pylab as pl
 
 
-def set_params(**kwargs):
+def setParams(**kwargs):
 
 	if len(kwargs) == 0:
 		kwargs = default_params
@@ -24,14 +24,14 @@ def set_params(**kwargs):
 	print '# update params', kwargs
 
 
-set_params(epsilon=0.3)
+setParams(epsilon=0.3)
 
 class system(win.window):
 
 	title = "System"
 	figsize = (6, 5)
 
-	def __init__(self, info=None, position=None, network=None):
+	def __init__(self, info=None, position=None, network=None, traces=None):
 		win.window.__init__(self, position)
 
 		self.x_orbit, self.y_orbit, self.orbit_period = None, None, None
@@ -39,6 +39,7 @@ class system(win.window):
 		self.stride = 30
 		self.info = info
 		self.network = network
+		self.traces = traces
 
 		self.ax = self.fig.add_subplot(111, yticks=[-1.5, -0.5, 0.5, 1.5], xticks=[0, 0.5, 1.0])
 		self.ax.set_xlim(0., 1.)
@@ -58,7 +59,7 @@ class system(win.window):
 		self.refresh_nullclines()
 		self.refresh_orbit()
 
-		self.key_func_dict.update(dict(C=system.set_params))
+		self.key_func_dict.update(dict(C=system.setParams))
 		
                 self.fig.canvas.mpl_connect('button_press_event', self.on_button)
 		self.fig.canvas.mpl_connect('button_release_event', self.off_button)
@@ -75,7 +76,7 @@ class system(win.window):
 			self.info.set(descriptor)
 
 
-	def set_params(self):
+	def setParams(self):
 
 		print "\n=======SET PARAMS======="
 		print "Enter new parameter value. (If you don't want to change a parameter, simply hit enter.)"
@@ -94,7 +95,7 @@ class system(win.window):
 				except:
 					pass
 		
-		set_params(**new_params)
+		setParams(**new_params)
 		print "=======SET PARAMS======="
 		self.refresh_nullclines()
 		self.refresh_orbit()
@@ -158,9 +159,14 @@ class system(win.window):
 		self.li_traj.set_data(self.y_orbit(tl.PI2*phi), self.x_orbit(tl.PI2*phi))
 		self.fig.canvas.draw()
 
+		try:
+			self.traces.computeTraces()
+		except:
+			pass
+
 
 	def on_button(self, event):
-			self.event_start = np.array([event.xdata, event.ydata])
+		self.event_start = np.array([event.xdata, event.ydata])
 
 
 	def N_output(self, CYCLES):
@@ -171,15 +177,15 @@ class system(win.window):
 		delta_params = np.array([event.xdata, event.ydata])-self.event_start
 
 		if event.button == 1:
-			set_params(I=model.params['I_0']+delta_params[0], x=model.params['x_0']+delta_params[1])
+			setParams(I=model.params['I_0']+delta_params[0], x=model.params['x_0']+delta_params[1])
 
-		elif event.button == 2:
-			new_m = model.params['m_0']+delta_params[0]
-			set_params(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m)
-			
 		elif event.button == 3:
+			new_m = model.params['m_0']+delta_params[0]
+			setParams(m=model.params['m_0']*(new_m<0.)+(new_m>0.)*new_m, k=model.params['k_0']+delta_params[1]*3.)
+			
+		elif event.button == 2:
 			new_eps = model.params['epsilon_0']+delta_params[0]
-			set_params(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps, k=model.params['k_0']+delta_params[1]*3.)
+			setParams(epsilon=model.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps)
 			
 		self.refresh_nullclines()
 		self.refresh_orbit()
