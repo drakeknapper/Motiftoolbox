@@ -4,6 +4,14 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+try:
+    from flask import Flask
+    print '# web server available'
+
+except:
+    print '# web server not available'
+
+
 for k in plt.rcParams.keys():
 
 	if k.split('.')[0] == 'keymap':
