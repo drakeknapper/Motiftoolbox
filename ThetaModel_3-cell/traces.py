@@ -40,7 +40,7 @@ class traces(win.window):
 		self.ax.set_ylim(-5.5, 1.5)
 
 		self.key_func_dict = dict(u=traces.increaseCycles, i=traces.decreaseCycles)
-		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
+		self.fig.canvas.mpl_connect('axes_enter_event', self.focusIn)
 
 		self.computeTraces()
 
@@ -59,7 +59,7 @@ class traces(win.window):
 		self.adjustCycles(self.CYCLES-1*(self.CYCLES>0))
 
 
-	def focus_in(self, event=None):
+	def focusIn(self, event=None):
 		descriptor = "CYCLES : "+str(self.CYCLES)+" ('u' > 'i')"
 
 		if self.info == None:
