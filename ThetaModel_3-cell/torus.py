@@ -28,6 +28,7 @@ if __name__ == "__main__":
 	import network as netw
 	import traces as tra
 	import info as nf
+	import pylab as pl
 		
 	i = nf.info()
 	s = sys.system(info=i)

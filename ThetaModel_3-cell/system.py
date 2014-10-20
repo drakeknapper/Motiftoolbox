@@ -8,7 +8,6 @@ import tools as tl
 import window as win
 
 import numpy as np
-import pylab as pl
 
 
 def set_params(**kwargs):
@@ -150,6 +149,8 @@ class system(win.window):
 
 
 if __name__ == "__main__":
+
+	import pylab as pl
 
 	sys = system()
 	pl.show()

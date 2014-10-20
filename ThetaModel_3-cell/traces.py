@@ -23,7 +23,7 @@ class traces(win.window):
 		self.network = network
 		self.CYCLES = 10
 		self.info = info
-		self.initial_condition = self.system.load_initial_condition(pl.rand(), pl.rand())
+		self.initial_condition = self.system.load_initial_condition(np.random.rand(), np.random.rand())
 
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 

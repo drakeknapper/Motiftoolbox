@@ -7,7 +7,6 @@ import tools as tl
 import window as win
 
 import numpy as np
-import pylab as pl
 
 
 class info(win.window):
@@ -32,6 +31,7 @@ class info(win.window):
 
 if __name__ == "__main__":
 	
+	import pylab as pl
 
 	net = info()
 	pl.show("+200+0")

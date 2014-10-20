@@ -7,7 +7,6 @@ import tools as tl
 import window as win
 
 import numpy as np
-import pylab as pl
 
 
 text2coupling = {}
@@ -118,6 +117,7 @@ class network(win.window):
 
 if __name__ == "__main__":
 		
+	import pylab as pl
 
 	net = network()
 
