@@ -25,7 +25,6 @@ tor = tor.torus(s, n, t, info=i, position=pos_torus)
 
 if pl.get_backend() == 'TkAgg':
 	s.fig.tight_layout()
-	#n.fig.tight_layout()
 	t.fig.tight_layout()
 	tor.fig.tight_layout()
 

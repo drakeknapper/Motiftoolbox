@@ -34,7 +34,7 @@ if __name__ == "__main__":
 	
 
 	net = info()
-	pl.show()
+	pl.show("+200+0")
 
 
 

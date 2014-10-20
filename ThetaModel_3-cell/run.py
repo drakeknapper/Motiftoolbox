@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-
+import Tkinter
 import system as sys
 import network as netw
 import traces as tra
@@ -16,8 +16,8 @@ pos_sys = '+0+0'
 pos_torus = '+800+0'
 
 i = nf.info(position=pos_info)
-s = sys.system(info=i, position=pos_sys)
 n = netw.network(info=i, position=pos_net)
+s = sys.system(info=i, position=pos_sys, network=n)
 n.system = s
 t = tra.traces(s, n, info=i, position=pos_tra)
 s.traces = t
