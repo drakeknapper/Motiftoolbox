@@ -38,7 +38,7 @@ class traces(win.window):
 		
 		self.ax.set_xlim(0., 100.)
 		self.ax.set_ylim(-5.5, 1.5)
-		self.fig.tight_layout()
+		#self.fig.tight_layout()
 
 		self.key_func_dict = dict(u=traces.increaseCycles, i=traces.decreaseCycles)
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
