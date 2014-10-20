@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
 
-
-#import Tkinter
+import Tkinter
 import system as sys
 import network as netw
 import traces as tra
 import info as nf
 import torus as tor
 import pylab as pl
-
-#root = Tkinter.Tk()
-#screen_width = root.winfo_screenwidth()
-#screen_height = root.winfo_screenheight() 
 
 pos_info = '+0+600'
 pos_tra = '+300+600'

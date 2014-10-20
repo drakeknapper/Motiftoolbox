@@ -4,25 +4,22 @@ import time
 import sys
 sys.path.insert(0, '../Tools')
 import tools as tl
+import window as win
 
 import numpy as np
 import pylab as pl
 
 
-class info:
+class info(win.window):
+
+	title = 'Info'
+	figsize = (3, 2)
 
 	def __init__(self, position=None):
-		self.fig = pl.figure('Info', figsize=(3, 2), facecolor='#EEEEEE')
+		win.window.__init__(self, position)
 		self.description = self.fig.text(0.1, 0.1, 'here comes the description')
 
-		if not position == None:
-			try:
-				self.fig.canvas.manager.window.wm_geometry(position)
-			except:
-				pass
 
-
-	
 	def set(self, text):
 		self.description.set_text(text)
 		self.fig.canvas.draw()
@@ -36,7 +33,7 @@ class info:
 if __name__ == "__main__":
 	
 
-	net = info(position="+200+0")
+	net = info()
 	pl.show()
 
 

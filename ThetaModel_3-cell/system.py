@@ -5,6 +5,7 @@ import sys
 sys.path.insert(0, '../Tools')
 import thetax2 as th2
 import tools as tl
+import window as win
 
 import numpy as np
 import pylab as pl
@@ -24,15 +25,20 @@ def set_params(**kwargs):
 
 
 
-class system:
+class system(win.window):
 
-	def __init__(self, info=None, position=None):
+	title = "System"
+	figsize = (6, 5)
+
+	def __init__(self, info=None, position=None, network=None, traces=None):
+		win.window.__init__(self, position)
+
 		self.x_orbit, self.y_orbit, self.orbit_period = None, None, None
 		self.dt = 0.1
 		self.stride = 30
 		self.info = info
-
-		self.fig = pl.figure('System', figsize=(5, 5))
+		self.network = network
+		self.traces = traces
 
 		self.ax = self.fig.add_subplot(111, yticks=[-1.5, -0.5, 0.5, 1.5])
 		self.ax.set_xlim(0., 1.)
@@ -49,7 +55,6 @@ class system:
 		self.tx_state_space = self.ax.text(0.2, -0.5, '', color='r')
 		self.ax.set_xlim(0., 3.*np.pi)
 		self.ax.set_ylim(-0.2, 3.)
-		self.fig.tight_layout()
 
 		self.refresh_rhs()
 		self.refresh_orbit()
@@ -59,8 +64,6 @@ class system:
 				self.fig.canvas.manager.window.wm_geometry(position)
 			except:
 				pass
-
-		self.fig.tight_layout()
 
 		self.fig.canvas.mpl_connect('button_press_event', self.on_button)
 		self.fig.canvas.mpl_connect('button_release_event', self.off_button)
@@ -120,9 +123,14 @@ class system:
 		
 		self.fig.canvas.draw()
 
+		try:
+			self.traces.computeTraces()
+		except:
+			pass
+
 
 	def on_button(self, event):
-			self.event_start = np.array([event.xdata, event.ydata])
+		self.event_start = np.array([event.xdata, event.ydata])
 
 
 	def N_output(self, CYCLES):
@@ -135,10 +143,6 @@ class system:
 		if event.button == 1:
 			set_params(omega=th2.params['omega_0']+delta_params[1], beta=th2.params['beta_0']+delta_params[0])
 
-		#elif event.button == 3:
-		#	new_eps = th2.params['epsilon_0']+delta_params[0]
-		#	set_params(epsilon=th2.params['epsilon_0']*(new_eps<0.)+(new_eps>0.)*new_eps, k=th2.params['k_0']+delta_params[1]*3.)
-			
 		self.refresh_rhs()
 		self.refresh_orbit()
 		self.focus_in()
