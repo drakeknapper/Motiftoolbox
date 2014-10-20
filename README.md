@@ -29,6 +29,26 @@ Leech_3-cell) and perform
 Enjoy.
 
 
+-------------------------------------------
+MAC OSX
+-------------------------------------------
+
+ 1. Download SourceTree application from http://www.sourcetreeapp.com/.
+ 2. Copy the link https://github.com/jusjusjus/Motiftoolbox.git.
+ 3. Open SourceTree, click on 'Clone Repository'.
+ 4. Paste the code into Source Path / URL and add .../Motitoolbox to the destination path
+ 5. Click clone. Let it finish and close SourceTree
+ 6. Open a terminal and type the following 
+ 
+
+> cd Motiftoolbox/Tools
+> make all
+
+enter one of the exixting directories (e.g. cd Fitzhugh_3-cell )
+
+
+> ./run.py
+
 
 -------------------------------------------
 CONTRIBUTORS
