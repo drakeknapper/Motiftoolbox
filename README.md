@@ -7,7 +7,7 @@ This is Motiftoolbox, a set of versatile tools to explore the dynamics of networ
 
 
 -------------------------------------------
-INSTALL # Install # install
+INSTALL
 -------------------------------------------
 
 -------------------------------------------
