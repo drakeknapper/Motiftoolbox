@@ -5,7 +5,6 @@ import sys
 sys.path.insert(0, '../Tools')
 import fitzhugh as fh
 import tools as tl
-import fork_master as fm
 
 import numpy as np
 import pylab as pl

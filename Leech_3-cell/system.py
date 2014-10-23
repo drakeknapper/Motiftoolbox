@@ -17,9 +17,6 @@ def set_params(**kwargs):
 		kwargs = default_params
 
 	model.params.update(kwargs)
-	#for k in kwargs.keys():
-		#for c in ['0', 'b', 'g', 'r']:
-		#	model.params[k+'_'+c] = kwargs[k]
 
 	print '# update params', kwargs
 
@@ -30,7 +27,7 @@ class system(win.window):
 	title = "Hodgkin-Huxley Dynamics (orbit+nullclines)"
 	figsize = (6, 5)
 
-	def __init__(self, info=None, position=None):
+	def __init__(self, info=None, position=None, traces=None):
 		win.window.__init__(self, position)
 
 		self.x_orbit, self.y_orbit, self.z_orbit, self.orbit_period = None, None, None, None
@@ -38,6 +35,7 @@ class system(win.window):
 		self.stride = 10
 		self.THRESHOLD = model.THRESHOLD
 		self.info = info
+		self.traces = traces
 
 		self.ax = self.fig.add_subplot(111, yticks=[-50, -25, 0, 25])
 		self.ax.set_xlim(0., 0.6)
@@ -121,6 +119,9 @@ class system(win.window):
 		phi = np.arange(2000.)/float(1999.)
 		self.li_traj.set_data(self.z_orbit(tl.PI2*phi), 1000.*self.x_orbit(tl.PI2*phi))
 		self.fig.canvas.draw()
+
+		if not self.traces == None:
+			self.traces.computeTraces()
 
 
 	def on_button(self, event):

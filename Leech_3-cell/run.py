@@ -24,6 +24,7 @@ i = nf.info(position=pos_info)
 s = sys.system(info=i, position=pos_sys)
 n = netw.network(info=i, position=pos_net, g_inh=0.0055)
 t = tra.traces(s, n, info=i, position=pos_tra)
+s.traces = t
 T = tor.torus(s, n, t, info=i, position=pos_torus)
 
 n.traces = t
@@ -31,5 +32,6 @@ n.traces = t
 if pl.get_backend() == 'TkAgg':
 	s.fig.tight_layout()
 	t.fig.tight_layout()
+	T.fig.tight_layout()
 
 pl.show()

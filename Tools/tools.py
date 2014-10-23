@@ -3,7 +3,6 @@
 import ctypes as ct
 import numpy as np
 from scipy.interpolate import splrep, splev
-import fork_master as fm
 import os
 import time
 import sys

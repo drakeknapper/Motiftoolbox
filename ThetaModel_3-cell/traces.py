@@ -6,7 +6,6 @@ sys.path.insert(0, '../Tools')
 import thetax2 as th2
 import tools as tl
 import window as win
-import fork_master as fm
 
 import numpy as np
 import pylab as pl

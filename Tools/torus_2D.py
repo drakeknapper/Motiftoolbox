@@ -4,7 +4,7 @@ import time
 import sys
 sys.path.insert(0, '../Tools')
 import tools as tl
-import distribute as fm
+import distribute
 import window as win
 import attractor as att
 import numpy as np
@@ -137,7 +137,7 @@ class torus_2D(win.window):
 
 
 	def compute_phase_trace_cpu(self, X):
-		return fm.distribute(self.phase_trace_cpu, 'i', range(X.shape[0]), kwargs={'X': X})
+		return distribute.distribute(self.phase_trace_cpu, 'i', range(X.shape[0]), kwargs={'X': X})
 
 
 
@@ -154,7 +154,7 @@ class torus_2D(win.window):
 				self.dt/float(self.stride),
 				self.N_output, self.stride)
 		V_all = np.swapaxes(V_all, 1, 2)	 # V_all[initial condition, voltage trace, time index]
-		return fm.distribute(self.phase_trace_gpu, 'i', range(V_all.shape[0]), kwargs={'V': V_all})
+		return distribute.distribute(self.phase_trace_gpu, 'i', range(V_all.shape[0]), kwargs={'V': V_all})
 	
 
 
@@ -226,7 +226,7 @@ class torus_2D(win.window):
 		if len(initial_conditions):
 			self.traces.CYCLES *= 4
 			new_attractors = [att.attractor( [[0., 0.]], initial_state=[0., 0.] ).classify()]
-			new_attractors.extend( fm.distribute(refine_attractor, 'initial_condition', initial_conditions) )
+			new_attractors.extend( distribute.distribute(refine_attractor, 'initial_condition', initial_conditions) )
 			self.traces.CYCLES /= 4
 		#"""
 
