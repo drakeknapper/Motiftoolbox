@@ -38,7 +38,6 @@ class torus_2D(win.window):
 
 		self.ax_basins = self.fig.add_subplot(122, xticks=ticks, yticks=ticks[1:])
 		self.ax_basins.set_xlabel(r'$\Delta\theta_{12}$', fontsize=20)
-		self.fig.tight_layout()
 
 		self.key_func_dict.update(dict(u=torus_2D.increase_grid, i=torus_2D.decrease_grid, E=type(self).erase_traces, g=torus_2D.switch_processor))
 

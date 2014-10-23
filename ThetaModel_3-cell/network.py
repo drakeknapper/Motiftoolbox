@@ -3,14 +3,10 @@
 import time
 import sys
 sys.path.insert(0, '../Tools')
-import thetax2 as th2
 import tools as tl
+import window as win
 
 import numpy as np
-import pylab as pl
-
-
-win_width, win_height, margin = 700, 600, 10
 
 
 text2coupling = {}
@@ -32,30 +28,19 @@ coupling2text[4] = 5
 N_TEXTS = len(text2coupling)
 
 
-def set_params(**kwargs):
 
-	if len(kwargs) == 0:
-		kwargs = default_params
+class network(win.window):
 
-	for k in kwargs.keys():
-
-		for c in ['0', 'b', 'g', 'r']:
-			th2.params[k+'_'+c] = kwargs[k]
-
-	print '# update params', kwargs
-
-
-
-class network:
+	title = "Network"
+	figize = (5, 3)
 
 	def __init__(self, g_inh=0.03, info=None, position=None):
+		win.window.__init__(self, position)
 
 		self.coupling_strength = g_inh*np.ones((6), float)
 		self.COUPLING_LOCKED = True
 		self.info = info
 		
-		self.fig = pl.figure('Network', figsize=(5, 3), facecolor='#EEEEEE')
-
 		self.ax = self.fig.add_axes([-0.12, -0.1, 1.1, 1.33])
 		tl.three_cells_alt(self.coupling_strength, ax=self.ax)
 
@@ -64,11 +49,6 @@ class network:
 		self.fig.canvas.mpl_connect('button_release_event', self.off_button)
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
 
-		if not position == None:
-			try:
-				self.fig.canvas.manager.window.wm_geometry(position)
-			except:
-				pass
 
 
 	def echo(self, string):
@@ -126,19 +106,7 @@ class network:
 			self.coupling_strength = (new_coupling>0.)*new_coupling
 			self.show_coupling()
 
-
-
 		self.fig.canvas.draw()
-
-
-	def unlock_coupling(self, switch, data=None):
-	
-		if switch.get_active():
-			self.COUPLING_LOCKED = False
-	
-        	else:
-			self.COUPLING_LOCKED = True
-	
 
 
 
@@ -149,6 +117,7 @@ class network:
 
 if __name__ == "__main__":
 		
+	import pylab as pl
 
 	net = network()
 
