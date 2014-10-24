@@ -29,6 +29,7 @@ description = dict(I="External current", k="K+ activation slope",
 			x="K+ activation shift", epsilon="time scale", E="Inh. reversal potential",
                         m="K+ current scale", sigma="noise amplitude")
 
+
 params['I_b'] = params['I_0'] #
 params['epsilon_b'] = params['epsilon_0'] #
 params['x_b'] = params['x_0'] #

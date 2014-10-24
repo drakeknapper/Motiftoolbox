@@ -20,18 +20,19 @@ pos_net = '+300+0'
 pos_sys = '+0+0'
 pos_torus = '+800+0'
 
-i = nf.info(position=pos_info)
-s = sys.system(info=i, position=pos_sys)
-n = netw.network(info=i, position=pos_net, g_inh=0.0055)
-t = tra.traces(s, n, info=i, position=pos_tra)
-s.traces = t
-T = tor.torus(s, n, t, info=i, position=pos_torus)
+info = nf.info(position=pos_info)
+system = sys.system(info=info, position=pos_sys)
+network = netw.network(info=info, position=pos_net, g_inh=0.0055)
+traces = tra.traces(system, network, info=info, position=pos_tra)
+torus = tor.torus(system, network, traces, info=info, position=pos_torus)
 
-n.traces = t
+system.traces = traces
+network.traces = traces
 
 if pl.get_backend() == 'TkAgg':
-	s.fig.tight_layout()
-	t.fig.tight_layout()
-	T.fig.tight_layout()
+
+	system.fig.tight_layout()
+	traces.fig.tight_layout()
+	torus.fig.tight_layout()
 
 pl.show()
