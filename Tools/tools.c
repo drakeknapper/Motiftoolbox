@@ -20,7 +20,8 @@
 #define V_K2	-0.018   // Sajia: same
 
 
-void crossings(const double* x, const unsigned N, double* ti, const double threshold) {
+void crossings(const double* x, const unsigned N, double* ti, const double threshold)
+{
 	unsigned i, j;
 	i = 0;
 	for(j=1; j<N; j++)

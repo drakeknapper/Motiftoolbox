@@ -67,9 +67,6 @@ fitzhugh_cuda.o: fitzhugh.cu
 .c.o:
 	$(CC) -c $< $(CFLAGS)
 
-.cpp.o:
-	$(CPP) -c $< $(CFLAGS)
-
 lib:
 	mkdir lib
 
