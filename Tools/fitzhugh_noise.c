@@ -15,8 +15,6 @@
 #define COUPLING_THRESHOLD	0. //
 #define THRESHOLD_SLOPE		100. //
 
-extern "C" {
-
 double boltzmann(const double V, const double V_0, const double k)
 {
 	return 1./(1.+exp(-k*(V-V_0)));
@@ -110,6 +108,4 @@ void integrate_n_em(const unsigned num_osci, double* y, const double* params, co
 			output[num_osci*i+j] = y[j*N_EQ1]; 					
 		}
 	}
-}
-
 }

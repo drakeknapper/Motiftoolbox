@@ -6,7 +6,6 @@ sys.path.insert(0, '../Tools')
 import fitzhugh as model
 import tools as tl
 import window as win
-import fork_master as fm
 from matplotlib import animation
 
 import numpy as np

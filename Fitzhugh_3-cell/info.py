@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import time
 import sys
 sys.path.insert(0, '../Tools')
 import tools as tl

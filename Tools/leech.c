@@ -23,8 +23,6 @@
 #define V_K2	-0.018   // Sajia: same
 
 
-extern "C" {
-
 void derivs_one(const double* y, double* dxdt, const double* p)
 {
 	dxdt[0] = ( -p[5]*pow(1./(1.+exp(-150.*(y[0]-EmNa))), 3.)*y[1]*(y[0]-p[2]) - p[4]*y[2]*y[2]*(y[0]-p[1]) - p[3]*(y[0]-p[0]) - p[9])/p[6]; // dV/dt
@@ -236,8 +234,6 @@ void step_three_rk4(double* y, const double* params, const double* coupling, con
 };
 
 
-
-}
 
 
 

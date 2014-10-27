@@ -6,7 +6,7 @@ from mpld3 import plugins
 from flask import Flask,request
 import pylab as pl
 import info as nf
-import network as netw
+import network3N as netw
 import system as sys
 import torus as tor
 import traces as tra

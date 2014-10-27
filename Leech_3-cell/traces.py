@@ -6,8 +6,6 @@ sys.path.insert(0, '../Tools')
 import leech as model
 import tools as tl
 import window as win
-import fork_master as fm
-import gtk
 import multiprocessing as mp
 import numpy as np
 import pylab as pl

@@ -47,10 +47,13 @@ class orbit(object):
 
 	def show(self):
 		from pylab import plot, show
-		phase = np.arange(0., 2.*np.pi, 0.01)
+
+		phase = np.arange(0., 2.*np.pi+0.01, 0.01)
+
 		X = self(phase)
 		plot(phase, X[0])
 		plot(phase, X[1])
+
 		show()
 
 
