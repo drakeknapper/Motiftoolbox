@@ -6,12 +6,16 @@
 </head>
 <body>
 <h2 style="color:red" align="center">Fitzhugh 3 Cell</h2>
-<div class="container">
-        <iframe id="torus" style="width:830px;height:500px;border:none" src="/torus"></iframe>
-        <iframe id="network" style="width:420px;height:500px;border:none;align:left;" src="/network"></iframe>
-        <iframe id="system" style="width:500px;height:500px;border:none" src="/system"></iframe>
-        <iframe id="traces" style="width:500px;height:500px;border:none;align:right" src="/traces"></iframe>
-</div>
+<iframe id="torus" style="width:830px;height:500px;border:none" src="/torus"></iframe>
+<iframe id="network" style="width:420px;height:500px;border:none;align:left;" src="/network"></iframe>
+<h6 style="color:blue" align="left">
+    <input type="Radio" name="systemRadio" value="0" checked> No Drag Events
+    <input type="Radio" name="systemRadio" value="1"> Drag Event Type 1
+    <input type="Radio" name="systemRadio" value="2"> Drag Event Type 2
+    <input type="Radio" name="systemRadio" value="3"> Drag Event Type 3<br>
+</h6>
+<iframe id="system" style="width:500px;height:500px;border:none" src="/system"></iframe>
+<iframe id="traces" style="width:500px;height:500px;border:none;align:right" src="/traces"></iframe>
 
 <!--parent.location.reload()-->
 </body>

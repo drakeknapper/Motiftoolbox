@@ -1,17 +1,17 @@
 #!/usr/bin/env python
+from matplotlib.backend_bases import Event
 
-
-import matplotlib.pyplot as plt, mpld3 as m
-from mpld3 import plugins,utils
+import mpld3 as m
+from mpld3 import plugins
 from flask import Flask,request
+import pylab as pl
 import info as nf
 import network as netw
 import system as sys
 import torus as tor
 import traces as tra
-import customplugin
-import pylab as pl
-import json
+from WebSupport.Plugins.clickPlugin import ClickPlugin
+from WebSupport.Plugins.dragPlugin import DragPlugin
 
 app = Flask(__name__)
 
@@ -27,8 +27,8 @@ n.system = s
 t = tra.traces(s, n, info=i, position=pos_tra)
 tr = tor.torus(s, n, t, info=i, position=pos_torus)
 
-plugins.connect(tr.fig, customplugin.ClickInfo(tr.fig))
-#plugins.connect(tr.fig, plugins.MousePosition())
+plugins.connect(tr.fig, ClickPlugin(tr.fig))
+plugins.connect(s.fig,DragPlugin(s.fig))
 sweepphasespace=False;
 
 
@@ -37,7 +37,6 @@ sweepphasespace=False;
 def hello():
     f = open('fitzhugh_3cell.html','r')
     HTML = f.read();
-    print HTML
     return HTML
 
 @app.route("/system")
@@ -79,6 +78,16 @@ def fun7():
         return
     return
 
+@app.route("/updatesystem")
+def fun8():
+    event = Event("mockEvent",s.fig.canvas);
+    event.xdata = float(request.args['startX'])
+    event.ydata = float(request.args['startY'])
+    s.on_button(event)
+    event.xdata = float(request.args['endX'])
+    event.ydata = float(request.args['endY'])
+    event.button = int(request.args['type'])
+    s.off_button(event)
 
 if __name__ == "__main__":
     app.run()
