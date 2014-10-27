@@ -3,7 +3,7 @@
 
 import Tkinter
 import system as sys
-import network as netw
+import network3N as netw
 import traces as tra
 import info as nf
 import torus as tor
