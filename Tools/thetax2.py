@@ -95,12 +95,11 @@ def integrate_one_rk4(initial_state, dt, N_integrate, stride=42):
 
 
 INITIAL_ORBIT = [0.0]
-from pylab import *
 
 def single_orbit(DT_ORBIT=0.05, N_ORBIT=5*10**4, STRIDE_ORBIT=10, V_threshold=0., verbose=0):
 
 	X = integrate_one_rk4(INITIAL_ORBIT, DT_ORBIT/float(STRIDE_ORBIT), N_ORBIT, STRIDE_ORBIT)
-	x_raw, y = cos(X[0]), sin(X[0])
+	x_raw, y = np.cos(X[0]), np.sin(X[0])
 	x_m, y_m = tl.splineLS1D(),  tl.splineLS1D()
 
 	try:
@@ -175,7 +174,7 @@ def integrate_four_rk4(initial_states, coupling, dt, N_integrate, stride=1):
 
 def right_hand_side(phase, color='0'):
 	p = parameters_one(color=color)
-	return p[0]-p[1]*cos(phase)-cos(2.*phase)
+	return p[0]-p[1]*np.cos(phase)-np.cos(2.*phase)
 
 
 #===

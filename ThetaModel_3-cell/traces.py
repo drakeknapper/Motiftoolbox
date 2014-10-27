@@ -5,21 +5,26 @@ import sys
 sys.path.insert(0, '../Tools')
 import thetax2 as th2
 import tools as tl
+import window as win
 import fork_master as fm
 
 import numpy as np
 import pylab as pl
 
-class traces:
+class traces(win.window):
+
+	title = 'Amplitude Traces'
+	figsize = (9, 2)
 
 	def __init__(self, phase_potrait, network, info=None, position=None):
+		win.window.__init__(self, position)
+
 		self.system = phase_potrait
 		self.network = network
 		self.CYCLES = 10
 		self.info = info
-		self.initial_condition = self.system.load_initial_condition(pl.rand(), pl.rand())
+		self.initial_condition = self.system.load_initial_condition(np.random.rand(), np.random.rand())
 
-		self.fig = pl.figure('Voltage Traces', figsize=(6, 2), facecolor='#EEEEEE')
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 
 		self.li_b, = self.ax.plot([], [], 'b-', lw=2.)
@@ -33,36 +38,28 @@ class traces:
 		
 		self.ax.set_xlim(0., 100.)
 		self.ax.set_ylim(-5.5, 1.5)
-		self.fig.tight_layout()
 
-		self.key_func_dict = dict(u=traces.increase_cycles, i=traces.decrease_cycles)
-		self.fig.canvas.mpl_connect('key_press_event', self.on_key)
-		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
+		self.key_func_dict = dict(u=traces.increaseCycles, i=traces.decreaseCycles)
+		self.fig.canvas.mpl_connect('axes_enter_event', self.focusIn)
 
-		if not position == None:
-			try:
-				self.fig.canvas.manager.window.wm_geometry(position)
-			except:
-				pass
+		self.computeTraces()
 
 
-	def adjust_cycles(self, adjustment):
-		self.CYCLES = adjustment.value
-		self.compute_traces()
 
-	
-	def increase_cycles(self):
-		self.CYCLES += 1
-		self.compute_traces()
-		self.focus_in()
-
-	def decrease_cycles(self):
-		self.CYCLES -= 1*(self.CYCLES > 0)
-		self.compute_traces()
-		self.focus_in()
+	def adjustCycles(self, adjustment):
+		self.CYCLES = adjustment
+		self.computeTraces()
+		self.focusIn()
 
 
-	def focus_in(self, event=None):
+	def increaseCycles(self):
+		self.adjustCycles(self.CYCLES+1)
+
+	def decreaseCycles(self):
+		self.adjustCycles(self.CYCLES-1*(self.CYCLES>0))
+
+
+	def focusIn(self, event=None):
 		descriptor = "CYCLES : "+str(self.CYCLES)+" ('u' > 'i')"
 
 		if self.info == None:
@@ -81,7 +78,7 @@ class traces:
 			self.key_func_dict[event.key] = lambda x: None
 
 
-	def compute_traces(self, initial_condition=None, plotit=True):
+	def computeTraces(self, initial_condition=None, plotit=True):
 
 		if initial_condition == None:
 			initial_condition = self.initial_condition

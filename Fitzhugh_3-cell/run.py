@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
 
-
-#import Tkinter
+import Tkinter
 import system as sys
 import network as netw
 import traces as tra
 import info as nf
 import torus as tor
 import pylab as pl
-
-#root = Tkinter.Tk()
-#screen_width = root.winfo_screenwidth()
-#screen_height = root.winfo_screenheight() 
 
 pos_info = '+0+600'
 pos_tra = '+300+600'
@@ -30,7 +25,6 @@ tor = tor.torus(s, n, t, info=i, position=pos_torus)
 
 if pl.get_backend() == 'TkAgg':
 	s.fig.tight_layout()
-	#n.fig.tight_layout()
 	t.fig.tight_layout()
 	tor.fig.tight_layout()
 

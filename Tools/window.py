@@ -29,11 +29,6 @@ class window(object):
                 self.key_func_dict = dict(Q=window.quit)
 		self.fig.canvas.mpl_connect('key_press_event', self.on_key)
 
-		try:
-			self.fig.tight_layout()
-
-		except:
-			pass
 
 		if not position == None:
 
