@@ -195,7 +195,7 @@ def single_orbit(DT_ORBIT=0.05, N_ORBIT=5*10**4, STRIDE_ORBIT=10, V_threshold=0.
 	x_m, y_m = tl.splineLS1D(), tl.splineLS1D()
 
 	try:
-		ni = tl.crossings(x_raw, V_threshold) # convert to millivolts
+		ni = np.asarray(tl.crossings(x_raw, V_threshold), dtype=int) # convert to millivolts
 		x, y = x_raw[ni[-2]:ni[-1]], y[ni[-2]:ni[-1]]
 		t = tl.PI2*np.arange(x.size)/float(x.size-1)
 		x_m.makeModel(x, t); y_m.makeModel(y, t)
