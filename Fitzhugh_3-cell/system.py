@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
-import time
 import sys
 sys.path.insert(0, '../Tools')
 import window as win
 import fitzhugh as model
 import tools as tl
-import network as net
 import numpy as np
 import pylab as pl
 

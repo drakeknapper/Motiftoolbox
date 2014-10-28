@@ -42,8 +42,6 @@
 //#define <++>	<++>	// <++>
 
 
-extern "C" {
-
 
 double alpha_m(const double V)		{ return 0.1*(50.-V)/(exp((50.-V)/10.)-1.); } 
 double beta_m(const double V)		{ return 4.*exp((25.-V)/18.); } 
@@ -218,8 +216,6 @@ void integrate_one_rk4(double* y, const double dt, const unsigned N, const unsig
 	}
 }
 
-
-}
 
 
 

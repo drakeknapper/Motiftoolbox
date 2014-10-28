@@ -7,7 +7,6 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 import tools as tl
 import numpy as np
-import fork_master as fm
 import scipy.optimize as opt
 import scipy.interpolate as trp
 
