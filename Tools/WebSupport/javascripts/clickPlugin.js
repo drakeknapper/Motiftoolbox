@@ -49,7 +49,7 @@ ClickPlugin.prototype.draw = function(){
                                                 client.send();
                                                 window.location.reload(true);
                                                 //parent.getElementById("traces").location.reload(true);
-                                                parent.location.reload(true);
+                                                //parent.location.reload(true);
                                             }
                               )
                             }
