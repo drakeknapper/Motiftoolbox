@@ -3,9 +3,10 @@
 
 import matplotlib.pyplot as plt, mpld3 as m
 from flask import Flask
-import info as nf
-import network as netw
+
 import system as sys
+import network3N as netw
+import info as nf
 import torus as tor
 import traces as tra
 
