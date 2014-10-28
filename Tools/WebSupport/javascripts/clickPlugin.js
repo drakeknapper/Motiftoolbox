@@ -7,6 +7,7 @@ function ClickPlugin(fig, props){
 };
 
 
+
 ClickPlugin.prototype.draw = function(){
     var obj = mpld3.get_element(this.props.id);
 
@@ -34,8 +35,7 @@ ClickPlugin.prototype.draw = function(){
                                                 client.open("GET", "/updatetorus?type=trace&xval="+fmt(x)+"&yval="+fmt(y));
                                                 client.send();
                                                 window.location.reload(true);
-                                                //parent.getElementById("traces").location.reload(true);
-                                                parent.location.reload(true);
+						parent.frames[3].location.reload(true);	// 3 : traces frame
                                             }
                               )
             }else if(i==1){
@@ -47,9 +47,7 @@ ClickPlugin.prototype.draw = function(){
                                                 var client = new XMLHttpRequest();
                                                 client.open("GET", "/updatetorus?type=sweep");
                                                 client.send();
-                                                window.location.reload(true);
-                                                //parent.getElementById("traces").location.reload(true);
-                                                //parent.location.reload(true);
+                                                window.location.reload(true);	// only needs to update the phase torus
                                             }
                               )
                             }

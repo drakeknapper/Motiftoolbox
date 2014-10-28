@@ -24,15 +24,18 @@ from WebSupport.Plugins.dragPlugin import DragPlugin
 app = Flask(__name__)
 
 i = nf.info()
-n = netw.network(info=i, )
-s = sys.system(info=i, network=n)
-n.system = s
-t = tra.traces(s, n, info=i)
-tr = tor.torus(s, n, t, info=i)
+n = netw.network(info=i)
+system = sys.system(info=i, network=n)
+traces = tra.traces(system, n, info=i)
+torus = tor.torus(system, n, traces, info=i)
 
-plugins.connect(tr.fig, ClickPlugin(tr.fig))
-plugins.connect(s.fig,DragPlugin(s.fig))
-sweepphasespace=False;
+n.system = system
+system.traces = traces
+
+
+plugins.connect(torus.fig, ClickPlugin(torus.fig))
+plugins.connect(system.fig, DragPlugin(system.fig))
+sweepphasespace = False;
 
 
 
@@ -44,11 +47,11 @@ def hello():
 
 @app.route("/system")
 def fun1():
-	return m.fig_to_html(s.fig)
+	return m.fig_to_html(system.fig)
 
 @app.route("/torus")
 def fun2():
-	return m.fig_to_html(tr.fig)
+	return m.fig_to_html(torus.fig)
 
 @app.route("/network")
 def fun3():
@@ -56,7 +59,7 @@ def fun3():
 
 @app.route("/traces")
 def fun4():
-	return m.fig_to_html(t.fig)
+	return m.fig_to_html(traces.fig)
 
 @app.route("/info")
 def fun5():
@@ -72,25 +75,25 @@ def fun7():
 	if request.args['type']=='sweep':
 		global sweepphasespace
 		if sweepphasespace==False :
-			tr.sweep_phase_space()
+			torus.sweep_phase_space()
 			sweepphasespace = True
 		return
 	elif request.args['type']=='trace':
 		print request.args['xval'],request.args['yval']
-		tr.click_traces(float(request.args['xval']),float(request.args['yval']))
+		torus.click_traces(float(request.args['xval']), float(request.args['yval']))
 		return
 	return
 
 @app.route("/updatesystem")
 def fun8():
-	event = Event("mockEvent",s.fig.canvas);
+	event = Event("mockEvent",system.fig.canvas);
 	event.xdata = float(request.args['startX'])
 	event.ydata = float(request.args['startY'])
-	s.on_button(event)
+	system.on_button(event)
 	event.xdata = float(request.args['endX'])
 	event.ydata = float(request.args['endY'])
 	event.button = int(request.args['type'])
-	s.off_button(event)
+	system.off_button(event)
 
 if __name__ == "__main__":
 	app.run()

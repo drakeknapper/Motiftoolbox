@@ -47,8 +47,7 @@
             coords.text("");
 
             window.location.reload(true);
-            parent.location.reload(true);
-            //parent.getElementById("traces").location.reload(true);
+            parent.frames[3].location.reload(true);	// 3 : traces frame
         }
         function returnDragType(){
             var radios = parent.document.getElementsByName('systemRadio');
