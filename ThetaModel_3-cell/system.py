@@ -109,6 +109,10 @@ class system(win.window):
 		self.fig.canvas.draw()
 
 
+	def refresh_nullclines(self):
+		pass
+
+
 	def refresh_orbit(self):
 	
 		try:
