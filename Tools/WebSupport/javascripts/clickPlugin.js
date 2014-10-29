@@ -41,6 +41,7 @@ ClickPlugin.prototype.draw = function(){
                                                 client.open("GET", "/"+eventHandlerURL+"?type=trace&xval="+fmt(x)+"&yval="+fmt(y));
                                                 client.send();
                                                 window.location.reload(true);
+						parent.frames[1].location.reload(true);
                                             }
                               )
             }else if(i==1){

@@ -49,7 +49,7 @@
             coords.text("");
 
             window.location.reload(true);
-            //parent.frames[3].location.reload(true);	
+            parent.frames[1].location.reload(true);	
         }
         function returnDragType(){
             var radios = parent.document.getElementsByName(radioButtonID);
