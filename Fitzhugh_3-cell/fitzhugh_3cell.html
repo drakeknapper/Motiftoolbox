@@ -9,37 +9,37 @@
     <form align="center">
         <input type="button" onClick="window.location.reload(true)" value="Refresh All">
     </form>
-    <table style="height:100%;width:100%">
-        <tr style="height:100%;width:100%">
-            <td style="height:100%;width:50%">
-                <div id="torusDiv" style="width:100%;height:70%;border:none;font-size:10px">
+    <table>
+        <tr>
+            <td>
+                <div id="torusDiv" style="font-size:14px">
                     <div style="color:blue" align="center">
                         <input type="Radio" name="torusRadio" value="0" checked> No Drag Events
                         <input type="Radio" name="torusRadio" value="1"> Drag Event Type 1
                     </div>
-                    <iframe id="torus" style="height:100%;width:100%;border:none" src="/torus"></iframe>
+                    <iframe id="torus" style="width:10in;height:5in;border:none" src="/torus"></iframe>
                 </div>
-                <br><br>
-                <iframe id="traces" style="height:30%;width:100%;border:none;" src="/traces"></iframe>
+                <br><br><br>
+                <iframe id="traces" style="width:10in;height:3in;border:none;" src="/traces"></iframe>
             </td>
-            <td style="height:110%;width:32%">
-                <div id="systemDiv" style="width:100%;height:70%;border:none;font-size:10px">
+            <td>
+                <div id="systemDiv" style="font-size:14px">
                     <div style="color:blue" align="center">
                         <input type="Radio" name="systemRadio" value="0" checked> No Drag Events
                         <input type="Radio" name="systemRadio" value="1"> Drag Event Type 1
                         <input type="Radio" name="systemRadio" value="2"> Drag Event Type 2
                         <input type="Radio" name="systemRadio" value="3"> Move X-Nullcline
                     </div>
-                    <iframe id="system" style="width:100%;height:100%;border:none" src="/system"></iframe>
+                    <iframe id="system" style="width:6in;height:5in;border:none" src="/system"></iframe>
                 </div>
                 <br><br>
-                <div id="networkDiv" style="height:45%;width:100%;border:none;align:right;font-size:10px">
+                <div id="networkDiv" style="font-size:14px">
                     <div style="color:blue" align="center">
                         <input type="Radio" name="networkRadio" value="0" checked> No Events
                         <input type="Radio" name="networkRadio" value="1"> Change Nearest Coupling Strength
                         <input type="Radio" name="networkRadio" value="2"> Change All Coupling Strengths
                     </div>
-                    <iframe id="network" style="height:100%;width:100%;border:none;align:right" src="/network"></iframe>
+                    <iframe id="network" style="width:6in;height:3in;border:none;align:right;" src="/network"></iframe>
                 </div>
             </td>
         </tr>

@@ -41,7 +41,10 @@ ClickPlugin.prototype.draw = function(){
                                                 client.open("GET", "/"+eventHandlerURL+"?type=trace&xval="+fmt(x)+"&yval="+fmt(y));
                                                 client.send();
                                                 window.location.reload(true);
-						parent.frames[1].location.reload(true);
+						                        parent.frames[1].location.reload(true);
+
+                                                //var iframe = parent.document.getElementById('torus');
+                                                //iframe.src = iframe.src;
                                             }
                               )
             }else if(i==1){
