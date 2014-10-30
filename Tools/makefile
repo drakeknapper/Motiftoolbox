@@ -1,6 +1,6 @@
 
 CC=gcc
-CPP=g++
+CPP=gcc
 CFLAGS=-O2 -march=x86-64 -fPIC -pipe
 #CFLAGS=-fPIC -Wall
 LDFLAGS=-lm
@@ -33,22 +33,22 @@ tools: tools.o lib
 	gcc -shared tools.o $(LDFLAGS) -o lib/_tools.so
 
 thetax2: thetax2.o lib
-	g++ -shared thetax2.o -o lib/_thetax2.so -lm
+	gcc -shared thetax2.o -o lib/_thetax2.so -lm
 
 fitzhugh: fitzhugh.o lib
-	g++ -shared fitzhugh.o -o lib/_fitzhugh.so -lm
+	gcc -shared fitzhugh.o -o lib/_fitzhugh.so -lm
 
 plant: plant.o lib
-	g++ -shared plant.o -o lib/_plant.so -lm
+	gcc -shared plant.o -o lib/_plant.so -lm
 
 leech: leech.o lib
-	g++ -shared leech.o -o lib/_leech.so -lm
+	gcc -shared leech.o -o lib/_leech.so -lm
 
 leech_cuda: leech.o leech_cuda.o lib
-	g++ -shared leech_cuda.o leech.o -o lib/_leech_cuda.so -L/usr/local/cuda/lib64 -lm -lcudart -lcuda
+	gcc -shared leech_cuda.o leech.o -o lib/_leech_cuda.so -L/usr/local/cuda/lib64 -lm -lcudart -lcuda
 
 fitzhugh_cuda: fitzhugh.o fitzhugh_cuda.o lib
-	g++ -shared fitzhugh_cuda.o fitzhugh.o -o lib/_fitzhugh_cuda.so -L/usr/local/cuda/lib64 -lm -lcudart -lcuda
+	gcc -shared fitzhugh_cuda.o fitzhugh.o -o lib/_fitzhugh_cuda.so -L/usr/local/cuda/lib64 -lm -lcudart -lcuda
 
 
 ###
