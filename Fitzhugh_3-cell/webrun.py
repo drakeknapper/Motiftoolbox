@@ -63,7 +63,7 @@ def fun5():
 @app.route("/pylabshow")
 def fun6():
 	pl.show()
-	return
+	return ""
 
 @app.route("/updatetorus")
 def fun7():
@@ -76,33 +76,56 @@ def fun7():
 	elif request.args['type']=='trace':
 		print request.args['xval'],request.args['yval']
 		torus.click_traces(float(request.args['xval']), float(request.args['yval']))
-		return
-	return
+		return ""
+	return ""
 
 @app.route("/updatesystem")
 def fun8():
-	event = Event("mockEvent",system.fig.canvas);
-	event.xdata = float(request.args['startX'])
-	event.ydata = float(request.args['startY'])
-	system.on_button(event)
-	event.xdata = float(request.args['endX'])
-	event.ydata = float(request.args['endY'])
-	event.button = int(request.args['type'])
-	system.off_button(event)
-
+    event = Event("mockEvent",system.fig.canvas)
+    event.xdata = float(request.args['startX'])
+    event.ydata = float(request.args['startY'])
+    system.on_button(event)
+    event.xdata = float(request.args['endX'])
+    event.ydata = float(request.args['endY'])
+    event.button = int(request.args['type'])
+    system.off_button(event)
+    return ""
 
 @app.route("/updatenetwork")
 def fun9():
-	event = Event("mockEvent",n.fig.canvas);
-	event.xdata = float(request.args['startX'])
-	event.ydata = float(request.args['startY'])
-	event.button = int(request.args['type'])
-	n.on_button(event)
-	event.xdata = float(request.args['endX'])
-	event.ydata = float(request.args['endY'])
-	event.button = int(request.args['type'])
-	n.off_button(event)
+    event = Event("mockEvent",n.fig.canvas);
+    event.xdata = float(request.args['startX'])
+    event.ydata = float(request.args['startY'])
+    event.button = int(request.args['type'])
+    n.on_button(event)
+    event.xdata = float(request.args['endX'])
+    event.ydata = float(request.args['endY'])
+    event.button = int(request.args['type'])
+    n.off_button(event)
+    return ""
+
+@app.route("/reset")
+def fun10():
+    pl.close('all')
+    global i,n,system,traces,torus,sweepphasespace;
+    del i,n,system,traces,torus,sweepphasespace;
+    i = nf.info()
+    n = netw.network(info=i,system=None)
+    system = sys.system(info=i, network=n,traces=None)
+    traces = tra.traces(system, n, info=i)
+    torus = tor.torus(system, n, traces, info=i)
+    n.system = system
+    system.traces = traces
+    plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButtonID="torusRadio"))
+    plugins.connect(system.fig, DragPlugin(eventHandlerURL="updatesystem",radioButtonID="systemRadio"))
+    plugins.connect(n.fig, DragPlugin(eventHandlerURL="updatenetwork",radioButtonID="networkRadio"))
+    sweepphasespace = False;
+    return ""
+
+
+
 
 if __name__ == "__main__":
 	#app.run()
     app.run(host='0.0.0.0')
+    app.debug = True

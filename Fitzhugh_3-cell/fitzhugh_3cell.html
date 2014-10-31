@@ -7,7 +7,16 @@
 <body style="height:100%;width:100%">
     <h2 style="color:red" align="center">Fitzhugh 3 Cell</h2>
     <form align="center">
-        <input type="button" onClick="window.location.reload(true)" value="Refresh All">
+        <input type="button" onClick="window.location.reload(true)" value="Refresh">
+        <script>
+                function resetAll(){
+                    var client = new XMLHttpRequest();
+                    client.open("GET", "/reset");
+                    client.send();
+                    window.location.reload(true);
+                }
+        </script>
+        <input type="button" onClick="resetAll()" value="Reset">
     </form>
     <table>
         <tr>
