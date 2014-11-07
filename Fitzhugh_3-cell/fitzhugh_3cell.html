@@ -17,6 +17,9 @@
                 }
         </script>
         <input type="button" onClick="resetAll()" value="Reset">
+        <em style="color:blue;font-size:18px">&emsp;&emsp;&emsp;&emsp;Edit Page Before Print : </em>
+        <input type="button" onClick="document.body.contentEditable = 'true';document.designMode = 'on'; void 0" value="On">
+        <input type="button" onClick="document.body.contentEditable = 'false';document.designMode = 'off'; void 0" value="Off">
     </form>
     <table>
         <tr>

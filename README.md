@@ -53,6 +53,19 @@ Enjoy.
 
 
 -------------------------------------------
+Web Server
+-------------------------------------------
+One time installation :
+sudo apt-get install python-pip
+sudo pip install Flask
+sudo pip install mpld3
+
+To start the server:
+Enter Fitzhugh_3-cell directory
+$ ./webrun.py
+
+
+-------------------------------------------
 CONTRIBUTORS
 -------------------------------------------
 
