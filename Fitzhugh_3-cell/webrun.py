@@ -10,6 +10,7 @@ import info as nf
 import network3N as netw
 import torus as tor
 import traces as tra
+import fitzhugh as model
 from WebSupport.Plugins.clickPlugin import ClickPlugin
 from WebSupport.Plugins.dragPlugin import DragPlugin
 from matplotlib.backend_bases import Event
@@ -108,9 +109,10 @@ def fun9():
 def fun10():
     pl.close('all')
     global i,n,system,traces,torus,sweepphasespace;
-    del i,n,system,traces,torus,sweepphasespace;
+    #del i,n,system,traces,torus,sweepphasespace;
     i = nf.info()
     n = netw.network(info=i,system=None)
+    reload(model)
     system = sys.system(info=i, network=n,traces=None)
     traces = tra.traces(system, n, info=i)
     torus = tor.torus(system, n, traces, info=i)
