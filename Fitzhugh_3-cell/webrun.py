@@ -73,7 +73,7 @@ def fun7():
 		if sweepphasespace==False :
 			torus.sweep_phase_space()
 			sweepphasespace = True
-		return
+		return ""
 	elif request.args['type']=='trace':
 		print request.args['xval'],request.args['yval']
 		torus.click_traces(float(request.args['xval']), float(request.args['yval']))
