@@ -188,6 +188,23 @@ class splineLS1D():
 ############################################################
 
 
+def adjustForPlotting(x, y, ratio, threshold):	# ratio = xscale/yscale
+
+	x, y = np.asarray(x), np.asarray(y)
+
+	dx, dy = x[1:]-x[:-1], ratio*(y[1:]-y[:-1]) 
+
+	xnew, ynew = [x[0]], [y[0]]
+	for i in xrange(1, x.size, 1):
+		if np.sqrt((x[i]-xnew[-1])**2 + (ratio*(y[i]-ynew[-1]))**2) > threshold:
+			xnew.append(x[i])
+			ynew.append(y[i])
+
+	return np.asarray(xnew), np.asarray(ynew)
+
+
+
+
 def plot_phase_2D(phase_1, phase_2, **kwargs):
 	from pylab import plot, subplot
 

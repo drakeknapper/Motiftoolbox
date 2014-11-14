@@ -126,14 +126,19 @@ class system(win.window):
 
 	def refresh_nullclines(self):
 		x_i = np.arange(self.x_min, self.x_max, 0.01)
-		self.li_ncl_x.set_data(model.nullcline_x(x_i, model.params['I_0'], model.params['m_0']), x_i)
-		self.li_ncl_y.set_data(model.nullcline_y(x_i, model.params['x_0'], model.params['k_0']), x_i)
+
+		nullcline_x = model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'])
+		nullcline_y = model.nullcline_y(x_i, model.params['x_0'], model.params['k_0'])
+
+		self.li_ncl_x.set_data(nullcline_x, x_i)
+		self.li_ncl_y.set_data(nullcline_y, x_i)
 
 		if not self.network == None:
 			g = self.network.coupling_strength
 
-			if all((g[0] == g_i for g_i in g)):
-				self.li_sft_ncl_x.set_data(model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'], model.params['E_0'], g[0]), x_i)
+			if all( (g[0] == g_i for g_i in g) ):
+				nullcline_xg = model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'], model.params['E_0'], g[0])
+				self.li_sft_ncl_x.set_data(nullcline_xg, x_i)
 
 			else:
 				self.li_sft_ncl_x.set_data([], [])
