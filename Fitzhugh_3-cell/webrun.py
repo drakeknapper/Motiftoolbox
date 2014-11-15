@@ -154,22 +154,41 @@ def fun9():
 @app.route("/reset")
 @requires_auth
 def fun10():
-	pl.close('all')
-	global i,n,system,traces,torus,sweepphasespace;
-	#del i,n,system,traces,torus,sweepphasespace;
-	info = nf.info()
-	network = netw.network(info=info, system=None)
-	reload(model)
-	system = sys.system(info=i, network=n,traces=None)
-	traces = tra.traces(system, n, info=i)
-	torus = tor.torus(system, n, traces, info=i)
-	network.system = system
-	system.traces = traces
-	plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButtonID="torusRadio"))
-	plugins.connect(system.fig, DragPlugin(eventHandlerURL="updatesystem",radioButtonID="systemRadio"))
-	plugins.connect(network.fig, DragPlugin(eventHandlerURL="updatenetwork",radioButtonID="networkRadio"))
-	sweepphasespace = False;
-	return ""
+    pl.close('all')
+    global info,network,system,traces,torus,sweepphasespace
+    reload(model)
+
+
+    info = nf.info()
+    network = netw.network(info=info)
+    system = sys.system(info=info, network=network)
+    traces = tra.traces(system, network, info=info)
+    torus = tor.torus(system, network, traces, info=info)
+    network.system = system
+    system.traces = traces
+
+
+
+    system.fig.tight_layout()
+    torus.fig.tight_layout()
+    traces.fig.tight_layout()
+
+    network.ax.patch.set_facecolor('#CCCC00')
+    traces.ax.patch.set_facecolor('#88DDDD')
+
+    torus.ax_traces.set_xlabel(r'phase lag: 2-1')
+    torus.ax_basins.set_xlabel(r'phase lag: 2-1')
+    torus.ax_traces.set_ylabel(r'phase lag: 3-1')
+
+
+    plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButtonID="torusRadio"))
+    plugins.connect(system.fig, DragPlugin(eventHandlerURL="updatesystem",radioButtonID="systemRadio"))
+    plugins.connect(network.fig, DragPlugin(eventHandlerURL="updatenetwork",radioButtonID="networkRadio"))
+
+    sweepphasespace = False;
+
+
+    return ""
 
 
 
