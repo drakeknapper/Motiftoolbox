@@ -40,14 +40,14 @@ class system(win.window):
 		self.traces = traces
 
 		self.ax = self.fig.add_subplot(111, yticks=[-1.5, -0.5, 0.5, 1.5], xticks=[0, 0.5, 1.0])
-		self.ax.set_xlim(0., 1.)
+		self.ax.set_xlim(-0.05, 1.05)
 		self.x_min, self.x_max = -1.5, 1.5
 		self.ax.set_ylim(self.x_min, self.x_max)
 		self.ax.set_ylabel(r'Membrane Voltage $V$ (a.u.)', fontsize=18)
 		self.ax.set_xlabel(r'Inactivation $x$', fontsize=18)
                 self.ax.set_title('Single-Cell Dynamics (+coupling)', fontsize=18)
 
-		self.li_traj, = self.ax.plot([], [], 'g-', lw=1., label='Oscillation Cycle')
+		self.li_traj, = self.ax.plot([], [], 'k-', lw=1., label='Oscillation Cycle')
 		self.li_ncl_y, = self.ax.plot([], [], 'b--', lw=2., label='nullcline $\dot{V}=0$')
 		self.li_ncl_x, = self.ax.plot([], [], 'g--', lw=2., label='nullcline $\dot{x}=0$')
 		self.li_sft_ncl_x, = self.ax.plot([], [], 'r-.', lw=2., label='with coupling')
@@ -130,15 +130,19 @@ class system(win.window):
 		nullcline_x = model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'])
 		nullcline_y = model.nullcline_y(x_i, model.params['x_0'], model.params['k_0'])
 
-		self.li_ncl_x.set_data(nullcline_x, x_i)
+		xscale, yscale = 1., 3.
+		nullcline_x, X_i = tl.adjustForPlotting(nullcline_x, x_i, ratio=xscale/yscale, threshold=0.03*xscale)
+		nullcline_y, x_i = tl.adjustForPlotting(nullcline_y, x_i, ratio=xscale/yscale, threshold=0.03*xscale)
+
+		self.li_ncl_x.set_data(nullcline_x, X_i)
 		self.li_ncl_y.set_data(nullcline_y, x_i)
 
 		if not self.network == None:
 			g = self.network.coupling_strength
 
 			if all( (g[0] == g_i for g_i in g) ):
-				nullcline_xg = model.nullcline_x(x_i, model.params['I_0'], model.params['m_0'], model.params['E_0'], g[0])
-				self.li_sft_ncl_x.set_data(nullcline_xg, x_i)
+				nullcline_xg = model.nullcline_x(X_i, model.params['I_0'], model.params['m_0'], model.params['E_0'], g[0])
+				self.li_sft_ncl_x.set_data(nullcline_xg, X_i)
 
 			else:
 				self.li_sft_ncl_x.set_data([], [])
@@ -158,8 +162,13 @@ class system(win.window):
 			self.tx_state_space.set_text("No closed orbit found!")
 			pass
 		
-		phi = np.arange(500.)/float(499.)
-		self.li_traj.set_data(self.y_orbit(tl.PI2*phi), self.x_orbit(tl.PI2*phi))
+		phi = np.arange(500)/float(499.)
+
+		xscale, yscale = 1., 3.
+		y, x = tl.adjustForPlotting(self.y_orbit(tl.PI2*phi), self.x_orbit(tl.PI2*phi), ratio=xscale/yscale, threshold=0.03*xscale)
+		y[-1], x[-1] = y[0], x[0]
+
+		self.li_traj.set_data(y, x)
 		self.fig.canvas.draw()
 
 		try:

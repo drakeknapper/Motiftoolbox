@@ -20,10 +20,12 @@ from flask import request, Response
 
 
 def check_auth(username, password):
-	"""This function is called to check if a username /
+	"""
+	This function is called to check if a username /
 	password combination is valid.
 	"""
-	keypair = open('/home/server/web_password', 'r').readline().split(',')
+	try:	keypair = open('/home/server/web_password', 'r').readline().split(',')
+	except:	keypair = ['user', 'password']
 
 	return username == keypair[0] and password == keypair[1]
 
@@ -58,10 +60,6 @@ system.traces = traces
 
 
 
-system.fig.tight_layout()
-torus.fig.tight_layout()
-traces.fig.tight_layout()
-
 network.ax.patch.set_facecolor('#CCCC00')
 traces.ax.patch.set_facecolor('#88DDDD')
 
@@ -69,8 +67,19 @@ torus.ax_traces.set_xlabel(r'phase lag: 2-1')
 torus.ax_basins.set_xlabel(r'phase lag: 2-1')
 torus.ax_traces.set_ylabel(r'phase lag: 3-1')
 
+system.ax.set_xlabel(r'Inactivation Variable')
+system.ax.set_ylabel(r'Voltage Variable')
 
-torus.switch_processor()
+
+
+
+
+torus.switch_processor()	# switches on the gpu if available
+
+
+system.fig.tight_layout()	# called all changes to the default layout has been made
+torus.fig.tight_layout()	# called all changes to the default layout has been made
+traces.fig.tight_layout()	# called all changes to the default layout has been made
 
 
 plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButtonID="torusRadio"))
