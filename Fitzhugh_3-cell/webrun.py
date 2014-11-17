@@ -23,10 +23,10 @@ def check_auth(username, password):
 	"""This function is called to check if a username /
 	password combination is valid.
 	"""
-	keypair = open('~/web_password', 'r').readline.split(',')
-
+	keypair = open('/home/server/web_password', 'r').readline().split(',')
 
 	return username == keypair[0] and password == keypair[1]
+
 
 def authenticate():
 	"""Sends a 401 response that enables basic auth"""
@@ -68,6 +68,9 @@ traces.ax.patch.set_facecolor('#88DDDD')
 torus.ax_traces.set_xlabel(r'phase lag: 2-1')
 torus.ax_basins.set_xlabel(r'phase lag: 2-1')
 torus.ax_traces.set_ylabel(r'phase lag: 3-1')
+
+
+torus.switch_processor()
 
 
 plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButtonID="torusRadio"))
