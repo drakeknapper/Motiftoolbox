@@ -191,6 +191,11 @@ class network(win.window):
 		ax.set_yticks([])
 		ax.set_axis_off()
 
+
+	def moveText(self, nText, vector):
+		self.ax.texts[nText].set_position( np.asarray(self.ax.texts[nText].get_position())
+									+ np.asarray(vector) )
+
 	
 
 

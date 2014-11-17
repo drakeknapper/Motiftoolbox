@@ -5,6 +5,7 @@ import mpld3 as m
 from mpld3 import plugins
 from flask import Flask,request
 import pylab as pl
+import numpy as np
 import system as sys
 import info as nf
 import network3N as netw
@@ -37,6 +38,8 @@ def authenticate():
 	'You have to login with proper credentials', 401,
 	{'WWW-Authenticate': 'Basic realm="Login Required"'})
 
+
+
 def requires_auth(f):
 	@wraps(f)
 	def decorated(*args, **kwargs):
@@ -60,8 +63,8 @@ system.traces = traces
 
 
 
-network.ax.patch.set_facecolor('#CCCC00')
-traces.ax.patch.set_facecolor('#88DDDD')
+network.ax.patch.set_facecolor('#777777')
+traces.ax.patch.set_facecolor('#777777')
 
 torus.ax_traces.set_xlabel(r'phase lag: 2-1')
 torus.ax_basins.set_xlabel(r'phase lag: 2-1')
@@ -69,9 +72,14 @@ torus.ax_traces.set_ylabel(r'phase lag: 3-1')
 
 system.ax.set_xlabel(r'Inactivation Variable')
 system.ax.set_ylabel(r'Voltage Variable')
+system.ax.set_title('')
 
 
-
+network.moveText(2, [0.02, -0.1])
+network.moveText(3, [0.02, -0.1])
+network.ax.texts[6].set_text('1')
+network.ax.texts[7].set_text('2')
+network.ax.texts[8].set_text('3')
 
 
 torus.switch_processor()	# switches on the gpu if available
@@ -86,7 +94,7 @@ plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus",radioButton
 plugins.connect(system.fig, DragPlugin(eventHandlerURL="updatesystem",radioButtonID="systemRadio"))
 plugins.connect(network.fig, DragPlugin(eventHandlerURL="updatenetwork",radioButtonID="networkRadio"))
 
-sweepphasespace = False;
+sweepingPhasespace = False;
 
 
 
@@ -127,17 +135,23 @@ def fun5():
 @app.route("/updatetorus")
 @requires_auth
 def fun7():
-	if request.args['type']=='sweep':
-		global sweepphasespace
-		if sweepphasespace==False :
+	global sweepingPhasespace
+
+	if request.args['type'] == 'sweep':
+
+		if sweepingPhasespace == False :
+			sweepingPhasespace = True
 			torus.sweep_phase_space()
-			sweepphasespace = True
+			sweepingPhasespace = False
+
 		return ""
-	elif request.args['type']=='trace':
-		print request.args['xval'],request.args['yval']
+
+	elif request.args['type'] == 'trace':
 		torus.click_traces(float(request.args['xval']), float(request.args['yval']))
 		return ""
+
 	return ""
+
 
 @app.route("/updatesystem")
 @requires_auth
@@ -152,6 +166,8 @@ def fun8():
 	system.off_button(event)
 	return ""
 
+
+
 @app.route("/updatenetwork")
 @requires_auth
 def fun9():
@@ -165,6 +181,8 @@ def fun9():
 	event.button = int(request.args['type'])
 	network.off_button(event)
 	return ""
+
+
 
 @app.route("/reset")
 @requires_auth

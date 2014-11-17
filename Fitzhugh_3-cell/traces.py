@@ -13,14 +13,14 @@ import pylab as pl
 class traces(win.window):
 
 	title = 'Voltage Traces'
-	figsize = (9, 2)
+	figsize = (13, 2)
 
 	def __init__(self, system, network, info=None, position=None):
 		win.window.__init__(self, position)
 		self.system = system
 		self.network = network
 		self.info = info
-		self.CYCLES = 10
+		self.CYCLES = 20
 
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 

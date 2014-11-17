@@ -4,46 +4,52 @@
     <meta charset="UTF-8">
     <title>Fitzhugh_3cell</title>
 </head>
-<body style="height:100%;width:100%;background-color: #222222">
+<body style="height:100%;width:91%;background-color: #222222">
 	<hr>
-    <h1 style="color:red" align="center">Virtual Laboratory:  Neural Ciruit Motif</h1>
+	<h1 style="color:red" align="center"> Virtual Laboratory:  Neural Ciruit Motif </h1>
+	<em style="color:#888888">by Krishna Pusuluri & Justus Schwabedal</em>
 	<hr>
     <table>
         <tr>
             <td>
                 <div id="torusDiv" style="font-size:20px">
-                    <iframe id="torus" style="width:9in;height:5in;border:none;background-color: #A44432" src="/torus"></iframe>
-                    <div style="color:white" align="center">
-                        <input type="Radio" name="torusRadio" value="0"> No Events
-                        <input type="Radio" name="torusRadio" value="1" checked> Click to Plot
+                    <iframe id="torus" style="width:11in;height:5.7in;border:none;background-color: #777077" src="/torus" scrolling="no"></iframe>
+                    <div style="color:#AAAAAA" align="left">
+                        <input type="Radio" name="torusRadio" value="1" checked> Trajectory (right) Sweep (left)
+                        <input type="Radio" name="torusRadio" value="0"> Disable
                     </div>
                 </div>
-                <br><br><br>
-                <iframe id="traces" style="width:9in;height:2in;border:none;background-color: #88DDDD;" src="/traces"></iframe>
+                <br>
+                <div id="tracesDiv" style="font-size:20px">
+                	<iframe id="traces" style="width:11in;height:2in;border:none;background-color: #777077;" src="/traces" scrolling="no"></iframe>
+                </div>
             </td>
             <td>
                 <div id="systemDiv" style="font-size:20px">
-                    <iframe id="system" style="width:6in;height:5in;align:center;border:none;background-color: #44AA44" src="/system"></iframe>
-                    <div style="color:white" align="center">
-                        <input type="Radio" name="systemRadio" value="0"> No Events
-                        <input type="Radio" name="systemRadio" value="1" checked> Drag to Change I , x
-                        <input type="Radio" name="systemRadio" value="2"> Drag to Change 'epsilon'
-                        <input type="Radio" name="systemRadio" value="3"> Drag to Change m , k
+                    <iframe id="system" style="width:4in;height:3.7in;align:center;border:none;background-color: #777077" src="/system" scrolling="no"></iframe>
+                    <div style="color:#AAAAAA" align="left">
+                        <input type="Radio" name="systemRadio" value="1" checked> Move Nullclines 
+			<br>
+                        <input type="Radio" name="systemRadio" value="2"> Change Timescale
+			<br>
+                        <input type="Radio" name="systemRadio" value="3"> Reshape Nullclines
+                        <input type="Radio" name="systemRadio" value="0"> Disable 
                     </div>
                 </div>
                 <br><br>
                 <div id="networkDiv" style="font-size:20px">
-                    <iframe id="network" style="width:6in;height:3in;border:none;align:center;background-color: #CCCC00;" src="/network"></iframe>
-                    <div style="color:white" align="center">
-                        <input type="Radio" name="networkRadio" value="0"> No Events
-                        <input type="Radio" name="networkRadio" value="1" checked> Change Nearest Coupling Strength
-                        <input type="Radio" name="networkRadio" value="2"> Change All Coupling Strengths
+                    <iframe id="network" style="width:4in;height:2.8in;border:none;align:center;background-color: #777077;" src="/network" scrolling="no"></iframe>
+                    <div style="color:#AAAAAA" align="left">
+                        <input type="Radio" name="networkRadio" value="1" checked> Change strength
+			<br>
+                        <input type="Radio" name="networkRadio" value="2"> Change all strengths
+                        <input type="Radio" name="networkRadio" value="0"> Disable
                     </div>
                 </div>
             </td>
         </tr>
     </table>
-    <form align="center">
+    <form align="left">
         <input type="button" onClick="window.location.reload(true)" value="Refresh">
         <script>
                 function resetAll(){

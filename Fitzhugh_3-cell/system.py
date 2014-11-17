@@ -27,7 +27,7 @@ setParams(epsilon=0.3)
 class system(win.window):
 
 	title = "System"
-	figsize = (6, 5)
+	figsize = (4.7, 4)
 
 	def __init__(self, info=None, position=None, network=None, traces=None):
 		win.window.__init__(self, position)

@@ -12,6 +12,7 @@ class torus(torus_2D.torus_2D):
 
         model = model
         V_trigger = 0.
+	figsize = (13, 6.5)
 
 	def __init__(self, system, network, traces, info=None, position=None):
                 torus_2D.torus_2D.__init__(self, system, network, traces, info, position)
