@@ -65,7 +65,7 @@ void derivs_three(const double* y, double* dxdt, const double* p, const double* 
 
 double boltzmann(const double x, const double x_0, const double k)
 {
-	return 1./(1.+exp(-k*(x-x_0)));
+	return 1./(1.+exp(k*(x_0-x)));
 }
 
 

@@ -22,12 +22,16 @@ class window(object):
 
 	title = "Window"
 	figsize = (5, 3)
+	testMode = False
 
-	def __init__(self, position=None):
+	def __init__(self, position=None, infoWindow=None):
+
 		self.fig = plt.figure(type(self).title, figsize=type(self).figsize)
 
-                self.key_func_dict = dict(Q=window.quit)
+                self.key_func_dict = dict(escape=window.quit)
 		self.fig.canvas.mpl_connect('key_press_event', self.on_key)
+		self.fig.canvas.mpl_connect('axes_enter_event', self.focusIn)
+		self.info = infoWindow
 
 
 		if not position == None:
@@ -40,19 +44,29 @@ class window(object):
 
 
 	def on_key(self, event):
-                #self.key_func_dict[event.key](self)
-		#"""
-                if event.key == 'Q':
+
+                if event.key == 'escape':
 		        self.key_func_dict[event.key](self)
-                        exit(0)
 
                 else:
-		        try:
+			if type(self).testMode:
                                 self.key_func_dict[event.key](self)
-		        except:
-                                self.key_func_dict[event.key] = lambda x: None
-		#"""
 
+			else:
+		        	try:
+                                	self.key_func_dict[event.key](self)
+		        	except:
+                                	self.key_func_dict[event.key] = lambda x: None
+
+
+
+	def echo(self, string):
+		if self.info == None: 	print string
+		else: 			self.info.set(string)
+
+
+	def focusIn(self, string):
+		pass
 
 
         def quit(self):
