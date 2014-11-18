@@ -183,6 +183,14 @@ def torusOnclick():
 	return ""
 
 
+@app.route("/torusClear")
+@requires_auth
+def torusClear():
+	torus.erase_traces()
+	torus.erase_basins()
+	return ""
+
+
 
 
 @app.route("/network")
