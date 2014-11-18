@@ -42,7 +42,6 @@ class torus_2D(win.window):
 		self.key_func_dict.update(dict(u=torus_2D.increase_grid, i=torus_2D.decrease_grid, E=type(self).erase_traces, g=torus_2D.switch_processor))
 
 		self.fig.canvas.mpl_connect('button_press_event', self.on_click)
-		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
 
 
 
@@ -92,29 +91,30 @@ class torus_2D(win.window):
 		if type(self).model.CUDA_ENABLED:
 			self.USE_GPU = not self.USE_GPU
 
-		self.focus_in()
+		self.focusIn()
 
+
+
+	def setGridsize(self, newGridsize):
+
+		if newGridsize > 1:
+			self.GRID = newGridsize
+
+		self.focusIn()
 
 
 	def increase_grid(self):
-		self.GRID += 1
-		self.focus_in()
+		self.setGridsize(self.GRID+1)
 
 
 
 	def decrease_grid(self):
-		self.GRID -= 1*(self.GRID > 0)
-		self.focus_in()
+		self.setGridsize(self.GRID-1)
 
 
 
-	def echo(self, string):
-		if self.info == None: 	print string
-		else: 			self.info.set(string)
 
-
-
-	def focus_in(self, event=None):
+	def focusIn(self, event=None):
 		descriptor = "GRID : "+str(self.GRID)+" ('u' > 'i')\n"
 		descriptor += "'E' : erase traces\n"
 		descriptor += "'g' : switch PU (now: %s)\n\n" % (torus_2D.PROCESSOR[self.USE_GPU])

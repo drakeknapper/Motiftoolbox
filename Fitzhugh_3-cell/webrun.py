@@ -96,11 +96,13 @@ def initialize():
 	traces.ax.patch.set_facecolor('#777777')
 	traces.fig.tight_layout()
 
+	# customize torus
 	torus.ax_traces.set_xlabel(r'phase lag: 2-1')
 	torus.ax_basins.set_xlabel(r'phase lag: 2-1')
 	torus.ax_traces.set_ylabel(r'phase lag: 3-1')
-	torus.switch_processor()	# switches on the gpu if available
 	torus.fig.tight_layout()
+	torus.switch_processor()	# switches on the gpu if available
+	if torus.USE_GPU: torus.setGridsize(24)
 	plugins.connect(torus.fig, ClickPlugin(eventHandlerURL="updatetorus", radioButtonID="torusRadio"))
 
 	# reload timing variable
