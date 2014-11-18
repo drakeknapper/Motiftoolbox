@@ -7,7 +7,7 @@
 <body style="height:100%;width:91%;background-color: #222222">
 	<hr>
 	<h1 style="color:red" align="center"> Virtual Dynamics Laboratory:  Neural Ciruit Motif </h1>
-	<em style="color:#888888">by Justus Schwabedal & Krishna Pusuluri</em>
+	<em style="color:#888888;float:right">by Justus Schwabedal & Krishna Pusuluri</em><br>
 	<hr>
     <table>
         <tr>
@@ -17,6 +17,15 @@
                     <div style="color:#AAAAAA" align="left">
                         <input type="Radio" name="torusRadio" value="1" checked> Trajectory (right) Sweep (left)
                         <input type="Radio" name="torusRadio" value="0"> Disable
+        		<script>
+                		function torusClear(){
+                    		var client = new XMLHttpRequest();
+                    		client.open("GET", "/torusClear");
+                    		client.send();
+                    		parent.frames[0].location.reload(true);
+                		}
+        		</script>
+        		<input type="button" style="font-size:20px;float:right" onClick="torusClear()" value="Clear torus">
                     </div>
                 </div>
                 <br>

@@ -28,6 +28,7 @@ class system(win.window):
 
 	title = "System"
 	figsize = (4.7, 4)
+	debug = False
 
 	def __init__(self, info=None, position=None, network=None, traces=None):
 		win.window.__init__(self, position)
@@ -64,7 +65,10 @@ class system(win.window):
 		self.fig.canvas.mpl_connect('axes_enter_event', self.focus_in)
 
 
+
+
 	def focus_in(self, event=None):
+
 		descriptor = "System Parameters :\n I_0 = %lf \n x_0 = %lf \n epsilon_0 = %lf \n k_0 = %lf \n m_0 = %lf" % (model.params['I_0'], model.params['x_0'], model.params['epsilon_0'], model.params['k_0'], model.params['m_0'])
                 descriptor += "\n\n'C': change parameters"
 		if self.info == None:
@@ -74,13 +78,13 @@ class system(win.window):
 			self.info.set(descriptor)
 
 
-	def setParams(self):
 
-		print "\n=======SET PARAMS======="
-		print "Enter new parameter value. (If you don't want to change a parameter, simply hit enter.)"
+	def inputParams(self):
 
 		new_params = dict()
 
+		print "\n=======SET PARAMS======="
+		print "Enter new parameter value. (If you don't want to change a parameter, simply hit enter.)"
 		for p in model.params.keys():
 			[p_name, n_osci] = p.split('_')
 
@@ -92,9 +96,18 @@ class system(win.window):
 
 				except:
 					pass
+		print "=======SET PARAMS=======\n"
 		
-		setParams(**new_params)
-		print "=======SET PARAMS======="
+		return new_params
+
+
+
+	def setParams(self, **kwargs):
+
+		if len(kwargs) == 0:
+			kwargs = self.inputParams()
+
+		setParams(**kwargs)
 		self.refresh_nullclines()
 		self.refresh_orbit()
 	

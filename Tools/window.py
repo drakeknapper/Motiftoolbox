@@ -22,7 +22,7 @@ class window(object):
 
 	title = "Window"
 	figsize = (5, 3)
-	testMode = False
+	debug = False
 
 	def __init__(self, position=None, infoWindow=None):
 
@@ -49,7 +49,7 @@ class window(object):
 		        self.key_func_dict[event.key](self)
 
                 else:
-			if type(self).testMode:
+			if type(self).debug:
                                 self.key_func_dict[event.key](self)
 
 			else:
