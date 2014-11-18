@@ -53,6 +53,27 @@ Enjoy.
 
 
 -------------------------------------------
+Web Server
+-------------------------------------------
+One time installation :
+sudo apt-get install python-pip
+sudo pip install Flask
+sudo pip install mpld3
+
+The webserver looks for a comma separated file named '~/web_password'.
+
+>username,password,
+>EOF
+
+Please, create one.
+
+
+To start the server:
+Enter Fitzhugh_3-cell directory
+$ ./webrun.py
+
+
+-------------------------------------------
 CONTRIBUTORS
 -------------------------------------------
 

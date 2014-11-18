@@ -1,6 +1,7 @@
     mpld3.register_plugin("drag", DragPlugin);
     DragPlugin.prototype = Object.create(mpld3.Plugin.prototype);
     DragPlugin.prototype.constructor = DragPlugin;
+    DragPlugin.prototype.requiredProps = ["eventHandlerURL","radioButtonID"];
     DragPlugin.prototype.defaultProps = {}
     function DragPlugin(fig, props){
         mpld3.Plugin.call(this, fig, props);
@@ -14,6 +15,8 @@
         var ax = fig.axes[0];
         fmt = d3.format(".3g");
         var coords = fig.canvas.append("text").attr("class", "mpld3-coordinates").style("text-anchor", "end").style("font-size", 12).attr("x", this.fig.width - 5).attr("y", this.fig.height - 5);
+        var eventHandlerURL = this.props.eventHandlerURL;
+        var radioButtonID = this.props.radioButtonID;
 
         var drag = d3.behavior.drag()
             .on("dragstart", dragstarted)
@@ -32,7 +35,6 @@
         }
 
         function dragended(d) {
-
           var pos = d3.mouse(this), endX = ax.x.invert(pos[0]), endY = ax.y.invert(pos[1]);
           coords.text(coords.text()+","+fmt(endX)+","+fmt(endY));
 
@@ -42,16 +44,15 @@
 
             var v = coords.text().split(",");
             var client = new XMLHttpRequest();
-            client.open("GET", "/updatesystem?type="+ret+"&startX="+v[0]+"&startY="+v[1]+"&endX="+v[2]+"&endY="+v[3]);
+            client.open("GET", "/"+eventHandlerURL+"?type="+ret+"&startX="+v[0]+"&startY="+v[1]+"&endX="+v[2]+"&endY="+v[3]);
             client.send();
             coords.text("");
 
             window.location.reload(true);
-            parent.location.reload(true);
-            //parent.getElementById("traces").location.reload(true);
+            parent.frames[1].location.reload(true);	
         }
         function returnDragType(){
-            var radios = parent.document.getElementsByName('systemRadio');
+            var radios = parent.document.getElementsByName(radioButtonID);
             for (var i = 0, length = radios.length; i < length; i++) {
                 if (radios[i].checked) {
                     return radios[i].value;

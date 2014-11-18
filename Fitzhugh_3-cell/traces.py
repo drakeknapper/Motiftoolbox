@@ -13,14 +13,14 @@ import pylab as pl
 class traces(win.window):
 
 	title = 'Voltage Traces'
-	figsize = (9, 2)
+	figsize = (13, 2)
 
 	def __init__(self, system, network, info=None, position=None):
 		win.window.__init__(self, position)
 		self.system = system
 		self.network = network
 		self.info = info
-		self.CYCLES = 10
+		self.CYCLES = 20
 
 		self.ax = self.fig.add_subplot(111, frameon=False, yticks=[])
 
@@ -92,9 +92,12 @@ class traces(win.window):
 
 		if plotit:
 			ticks = np.asarray(t[::t.size/10], dtype=int)
-			self.li_b.set_data(t, V_i[:, 0])
-			self.li_g.set_data(t, V_i[:, 1]-2.)
-			self.li_r.set_data(t, V_i[:, 2]-4.)
+
+			xscale, yscale = t[-1], 2.
+			for (i, li) in enumerate([self.li_b, self.li_g, self.li_r]):
+				tj, Vj = tl.adjustForPlotting(t, V_i[:, i], ratio=xscale/yscale, threshold=0.05*xscale)
+				li.set_data(tj, Vj-i*2)
+
 			self.ax.set_xticks(ticks)
 			self.ax.set_xticklabels(ticks)
 			self.ax.set_xlim(t[0], t[-1])

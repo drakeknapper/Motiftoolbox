@@ -74,6 +74,15 @@ class window(object):
             exit(0)
 
 
+	"""
+	if websupport:
+		@...
+		def toHtml(self):
+			return m.fig_to_html(self.fig)
+		pass
+	"""
+
+
 if __name__ == "__main__":
 	win = window()
 	plt.show()
