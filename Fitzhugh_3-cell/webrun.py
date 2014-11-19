@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 
+import matplotlib	#
+matplotlib.use('Agg')	# This prevents the x server to start.
+
 import mpld3 as m
 from mpld3 import plugins
 from flask import Flask,request
