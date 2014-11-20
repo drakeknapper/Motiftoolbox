@@ -60,7 +60,7 @@ sudo apt-get install python-pip
 sudo pip install Flask
 sudo pip install mpld3
 
-The webserver looks for a comma separated file named '~/web_password'.
+The webserver looks for a comma separated file named '/usr/sbin/MotiftoolboxPwd'.
 
 >username,password,
 >EOF
