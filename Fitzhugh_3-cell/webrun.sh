@@ -1,3 +1,3 @@
 #! /bin/bash
 
-nohup webrun.py > ~/server.err 2>&1 &
+nohup ./webrun.py > ~/server.err 2>&1 &
