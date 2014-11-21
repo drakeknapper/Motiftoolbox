@@ -32,8 +32,13 @@ def check_auth(username, password):
 	This function is called to check if a username /
 	password combination is valid.
 	"""
-	try:	keypair = open('/usr/sbin/MotiftoolboxPwd', 'r').readline().split(',')
-	except:	keypair = ['user', 'password']
+	try:	
+		f = open('/usr/sbin/MotiftoolboxPwd', 'r')
+		keypair = f.readline().split(',')
+		f.close()
+
+	except:
+		keypair = ['user', 'password']
 
 	return username == keypair[0] and password == keypair[1]
 
@@ -240,7 +245,7 @@ def loadInfo():
 if __name__ == "__main__":
 
 	initialize()
-	app.run(host='0.0.0.0', port=25565)
+	app.run(host='0.0.0.0', port=8080)
 	app.debug = True
 
 
