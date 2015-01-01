@@ -163,6 +163,8 @@ if CUDA_ENABLED:
 		return np.reshape(X_out, (N_initials, N_integrate, 4), 'C')
 
 
+
+
 #=== CUDA ===#
 
 
@@ -288,6 +290,7 @@ def step_n_em(initial_state, p, coupling_strength, dt, stride):
 #===
 
 
+
 def nullcline_x(x, I, m=1., E=0., g=0.):
 	return m*(x - x**3) + I + g*(E - x)
 
@@ -314,6 +317,10 @@ def g_critical(I):
         return g_of_V(V_opt)
 
 
+
+
+
+
 if __name__ == '__main__':
 
 	from pylab import *
@@ -321,8 +328,8 @@ if __name__ == '__main__':
 	import time
 
 
-        print g_critical(I=0.5)
-        exit(0)
+        #print g_critical(I=0.5)
+        #exit(0)
 
 	dt = 0.02
 	stride = 10

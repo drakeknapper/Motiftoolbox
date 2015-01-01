@@ -6,8 +6,9 @@ import window as win
 class system(win.window, object):
 
 	title = "System"
-	figize = (5, 5)
+	figsize = (5, 5)
 	params = {}
+
 
 	def __init__(self, position=None):
 		win.window.__init__(self, position)
@@ -48,10 +49,29 @@ class system(win.window, object):
 	
 
 	def load_initial_condition(self, x, y): # only one phase:  everything's square!
+		"""
+		Outdated
+		"""
 		X = np.zeros((model.N_EQ3), float)
 		phi_x, phi_y = tl.PI2*(1.-x), tl.PI2*(1.-y)
 		X[::model.N_EQ1] = self.x_orbit([0., phi_x, phi_y])
 		X[1::model.N_EQ1] = self.y_orbit([0., phi_x, phi_y])
+		return X
+
+
+
+	def loadInitialCondition(self, dphi): # only one phase:  everything's square!
+
+		dphi = np.asarray(dphi)
+		NODES = dphi.size
+
+		phi = np.concatenate(([0.], tl.PI2*(1.-dphi)))
+
+		X = np.zeros((model.N_EQ1*NODES), float)
+
+		for i in xrange(NODES):
+			X[i::model.N_EQ1] = self.orbit[i](phi)
+
 		return X
 
 
@@ -77,15 +97,11 @@ class system(win.window, object):
 
 
 
-
-
-
-
-
-
 if __name__ == "__main__":
 
 	import pylab as pl
 
 	mysys = system()
 	pl.show()
+
+

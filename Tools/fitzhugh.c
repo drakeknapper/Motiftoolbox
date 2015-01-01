@@ -38,11 +38,14 @@ void integrate_one_rk4(double* y, const double* params, double* output, const do
 	unsigned i, j, k;
 	double dt2, dt6;
 	double y1[N_EQ1], y2[N_EQ1], k1[N_EQ1], k2[N_EQ1], k3[N_EQ1], k4[N_EQ1];
-	dt2 = dt/2.; dt6 = dt/6.;
 
+	dt2 = dt/2.; dt6 = dt/6.;
 	for(j=0; j<N_EQ1; j++) output[j] = y[j];
-	for(i=1; i<N; i++) {
-		for(j=0; j<stride; j++) {
+
+	for(i=1; i<N; i++)
+	{
+		for(j=0; j<stride; j++)
+		{
 			derivs_one(y, k1, params);
 			for(k=0; k<N_EQ1; k++) y1[k] = y[k]+k1[k]*dt2; 			
 			derivs_one(y1, k2, params);
