@@ -96,6 +96,21 @@ N_EQ4 = 4*N_EQ1
 
 if CUDA_ENABLED:
 
+	lib.cuda_integrate_one_nosave.argtype = [ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.c_double, ct.c_uint, ct.c_uint]
+	def cuda_integrate_one_rk4_nosave(initial_states, dt, N_integrate):
+		initial_states = np.array(initial_states).flatten()
+		N_initials = initial_states.size/N_EQ1 # initial states / state variables = initial conditions
+
+		p = parameters_one()
+	
+		lib.cuda_integrate_one_nosave(initial_states.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_uint(initial_states.size),
+					p.ctypes.data_as(ct.POINTER(ct.c_double)),
+					ct.c_double(dt), ct.c_uint(N_integrate))
+
+		return np.reshape(initial_states, (N_initials, N_EQ1), 'C')
+
+
+
 	lib.cuda_integrate_three.argtype = [ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_uint, ct.c_double, ct.c_uint, ct.c_uint]
 	def cuda_integrate_three_rk4(initial_states, coupling, dt, N_integrate, stride=1):
 		initial_states = np.asarray(initial_states)
@@ -169,6 +184,22 @@ if CUDA_ENABLED:
 
 
 
+lib.integrate_one_rk4_nosave.argtypes = [ct.POINTER(ct.c_double), 
+					ct.POINTER(ct.c_double),
+					ct.c_double, ct.c_uint]
+def integrate_one_rk4_nosave(initial_state, dt, N_integrate, stride=42):
+	initial_state = np.array(initial_state)
+	assert initial_state.size == N_EQ1
+
+	p = parameters_one()
+
+	lib.integrate_one_rk4_nosave(initial_state.ctypes.data_as(ct.POINTER(ct.c_double)),
+				p.ctypes.data_as(ct.POINTER(ct.c_double)),
+				ct.c_double(dt), ct.c_uint(N_integrate))
+	return initial_state
+
+
+
 lib.integrate_one_rk4.argtypes = [ct.POINTER(ct.c_double), 
 					ct.POINTER(ct.c_double),
 					ct.POINTER(ct.c_double),
@@ -187,8 +218,13 @@ def integrate_one_rk4(initial_state, dt, N_integrate, stride=42):
 	return np.reshape(X_out, (N_EQ1, N_integrate), 'F')
 
 
-INITIAL_ORBIT = [-0.66570294, -1.07775077]
-from pylab import *
+INITIAL_ORBIT = np.array([-0.66570294, -1.07775077])
+dt = 0.05
+stride = 10
+N_integrate = 5*10**4
+IDX_THRESHOLD = 0
+THRESHOLD = 0.
+
 
 def single_orbit(DT_ORBIT=0.05, N_ORBIT=5*10**4, STRIDE_ORBIT=10, V_threshold=0., verbose=0):
 
@@ -289,6 +325,10 @@ def step_n_em(initial_state, p, coupling_strength, dt, stride):
 
 #===
 
+IDX_COUPLING = 0
+def coupling_function(state, other, THRESHOLD_SLOPE=100., COUPLING_THRESHOLD=0.):
+	return (params['E_0']-state)/(1.+np.exp(-THRESHOLD_SLOPE*(other-COUPLING_THRESHOLD)))
+
 
 
 def nullcline_x(x, I, m=1., E=0., g=0.):
@@ -333,11 +373,23 @@ if __name__ == '__main__':
 
 	dt = 0.02
 	stride = 10
-	N = 10**3
+	N = 10**5
 	N_initials = 100
 
 	#coupling = 0.001*ones((12), float)
 	coupling = 0.001*ones((6), float)
+
+	X = array([INITIAL_ORBIT+0.3*randn(2) for i in xrange(100)])
+	plot(X[:, 1], X[:, 0], 'ko')
+	dtx, Nx = dt/float(stride), 3010*stride
+	#X = array([integrate_one_rk4_nosave(X[i], dtx, Nx) for i in xrange(100)])
+	X = cuda_integrate_one_rk4(X, dtx, Nx)
+	plot(X[:, 1], X[:, 0], 'ro')
+	show()
+	exit(0)
+	#print X[:, -1]
+	#plot(X[0], X[1])
+	#show()
 
 	#single_orbit(verbose=1)
 	#show()

@@ -59,6 +59,38 @@ __device__ void derivs_three(double* y, double* dxdt, const double* p, const dou
 __device__ void assign(double *x, double *y, const unsigned ngls) { for(int i=0; i<ngls; i++) x[i] = y[i]; }
 
 
+__global__ void rk4_one(const unsigned THREADS, double *X, const double dt, const unsigned iterations, double *p)
+{
+	const int THREAD_ID=blockDim.x*blockIdx.x + threadIdx.x;
+
+	if(THREAD_ID < THREADS)
+	{
+
+	const int thread_init=N_EQ1*THREAD_ID;
+	const double dt2=dt/2., dt6=dt/6.;
+	double x[N_EQ1], x1[N_EQ1], x2[N_EQ1], k1[N_EQ1], k2[N_EQ1], k3[N_EQ1], k4[N_EQ1], P[NP1];
+	int t, i;
+
+	assign(x, X+thread_init, N_EQ1);
+	assign(P, p, NP1);
+
+	for(t=0; t<iterations; t++)
+	{
+		derivs_one(x, k1, P); 							// k1 = f(x)
+		for(i=0; i<N_EQ1; i++) x1[i] = x[i]+k1[i]*dt2; 				// x1 = x + k1*dt/2
+		derivs_one(x1, k2, P); 							// k2 = f(x1)
+		for(i=0; i<N_EQ1; i++) x2[i] = x[i]+k2[i]*dt2; 				// x2 = x + k2*dt/2
+		derivs_one(x2, k3, P); 							// k3 = f(x2)
+		for(i=0; i<N_EQ1; i++) x2[i] = x[i]+k3[i]*dt; 				// x2 = x + k3*dt
+		derivs_one(x2, k4, P); 							// k4 = f(x+k3*dt)
+		for(i=0; i<N_EQ1; i++) x[i] += dt6*(k1[i]+2.*(k2[i]+k3[i])+k4[i]); 	// x_n+1 = x_n + dt (...)/6.
+	}
+	assign(X+thread_init, x, N_EQ1);
+
+	}
+};
+
+
 __global__ void rk4_three(const unsigned THREADS, double *X, const double dt, const unsigned iterations, const unsigned stride, double *p, double *kij, double *output)
 {
 	const int THREAD_ID=blockDim.x*blockIdx.x + threadIdx.x;
@@ -243,6 +275,44 @@ __global__ void rk4_four(const unsigned THREADS, double *X, const double dt, con
 
 
 extern "C" {
+
+
+void cuda_integrate_one_nosave(double* y_init, const unsigned size_y_init,
+			double* params,
+			const double dt, const unsigned iterations)
+{	// y_init is also output.
+	unsigned THREADS, BLOCKS;
+	THREADS = size_y_init/N_EQ1;
+	BLOCKS = THREADS/THREADS_PER_BLOCK+1;
+
+	cudaError_t err;
+	int device=0;
+	cudaDeviceProp device_prop;
+
+	if(err = cudaGetDeviceProperties(&device_prop, device)) cout << cudaGetErrorString(err) << endl;
+        cout << "# GPU Device " << device << ": \""<< device_prop.name << "\" with compute capability " << device_prop.major << "." << device_prop.minor << endl;
+
+	double *p, *Xd;
+
+	if(err = cudaMalloc((void**) &p, NP1*sizeof(double))) cout << cudaGetErrorString(err) << endl;
+	if(err = cudaMalloc((void**) &Xd, size_y_init*sizeof(double))) cout << cudaGetErrorString(err) << endl;
+
+
+
+	if(err = cudaMemcpy(p, params, NP1*sizeof(double), cudaMemcpyHostToDevice)) cout << cudaGetErrorString(err) << endl;
+	if(err = cudaMemcpy(Xd, y_init, size_y_init*sizeof(double), cudaMemcpyHostToDevice)) cout << cudaGetErrorString(err) << endl;
+
+
+	cout << "# starting computation with " << BLOCKS << " blocks a " << THREADS_PER_BLOCK << " threads." << endl;
+	rk4_one<<<BLOCKS, THREADS_PER_BLOCK>>>(THREADS, Xd, dt, iterations, p);
+
+
+	if(err = cudaMemcpy(y_init, Xd, (size_t)size_y_init*sizeof(double), cudaMemcpyDeviceToHost)) cout << "Error in copy device to host: " << cudaGetErrorString(err) << endl;
+
+
+	cudaFree(p);
+	cudaFree(Xd);
+}
 
 
 void cuda_integrate_three(double* y_init, const unsigned size_y_init,

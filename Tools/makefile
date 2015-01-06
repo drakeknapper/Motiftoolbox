@@ -13,6 +13,10 @@ LDFLAGS=-lm
 #
 ###
 
+
+test: allall fitzhugh_cuda
+	rm *.o
+
 cuda: allall fitzhugh_cuda leech_cuda
 	rm *.o
 
