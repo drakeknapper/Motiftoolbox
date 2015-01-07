@@ -23,7 +23,7 @@ PI2 = tl.PI2
 V_0 = 0.                # coupling threshold
 threshold_slope = 100.          # coupling threshold slope
 
-params = dict(I_0=0.4, k_0=10., x_0=0., epsilon_0=0.05, E_0=-1.5, m_0=1., sigma_0=0.)
+params = dict(I_0=0.4, k_0=10., x_0=0., epsilon_0=0.3, E_0=-1.5, m_0=1., sigma_0=0.)
 
 description = dict(I="External current", k="K+ activation slope",
 			x="K+ activation shift", epsilon="time scale", E="Inh. reversal potential",
@@ -83,6 +83,13 @@ def parameters_four():
 def parameters_n():
         return parameters_one_noise('0')
 
+
+def setParams(**kwargs):
+	for k in kwargs.keys():
+		for c in ['0', 'b', 'g', 'r']:
+			params[k+'_'+c] = kwargs[k]
+
+	print '# update params', kwargs
 
 #===
 

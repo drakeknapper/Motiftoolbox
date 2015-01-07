@@ -30,7 +30,7 @@ all: allall
 #
 ###
 
-allall: tools fitzhugh thetax2 leech plant
+allall: tools fitzhugh thetax2 leech plant prcNetwork
 
 
 tools: tools.o lib
@@ -47,6 +47,9 @@ plant: plant.o lib
 
 leech: leech.o lib
 	gcc -shared leech.o -o lib/_leech.so -lm
+
+prcNetwork: prcNetwork.o lib
+	gcc -shared prcNetwork.o $(LDFLAGS) -o lib/_prcNetwork.so
 
 leech_cuda: leech.o leech_cuda.o lib
 	gcc -shared leech_cuda.o leech.o -o lib/_leech_cuda.so -L/usr/local/cuda/lib64 -lm -lcudart -lcuda
