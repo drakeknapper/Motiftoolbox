@@ -141,13 +141,13 @@ class splineLS1D():
 			return splev(x*XMIN*XMAX+XMAX*(1.-XMIN)*self.xmin+XMIN*(1.-XMAX)*self.xmax, self.tck)
 
 		else:
-			return scipy.zeros((x.size), float)
+			return np.zeros((x.size), float)
 
 	def df(self, x):
 		if self.isphase:
 			return spalde(np.mod(x, 2.*np.pi), self.tck)[:, 1]
 
-		return scipy.array(spalde(x, self.tck))[:, 1]
+		return np.array(spalde(x, self.tck))[:, 1]
 
 	def saveCoefs(self, filename=None, file=None, close=True):
 		p = self.get('params')

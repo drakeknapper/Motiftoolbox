@@ -367,7 +367,7 @@ def g_critical(I):
 
 def createAutoCode(filename):
 
-	diffEqs = """
+	diffEqs_txt = """
 	f[0] = par[5]*(u[0]-u[0]*u[0]*u[0])-u[1]+par[0];
 	f[1] = par[1]*(1./(1.+exp(-par[3]*(u[0]-par[2])))-u[1]);
 	"""
@@ -381,7 +381,51 @@ def createAutoCode(filename):
 	par[5] = %lf;
 	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'])
 	
-	autoAdapter.createAutoCode(filename, diffEqs, params_txt)
+	autoAdapter.createAutoCode(filename, diffEqs_txt, params_txt)
+
+
+def createAutoCode2(filename):
+
+	diffEqs_txt = """
+	doublereal x, y, xh, yh, m, I, eps, k, v0;
+	doublereal fxdx, fxdy, fydy, fydx, x2, E, Einv;
+
+	x = u[0];
+	y = u[1];
+	xh = u[2];
+	yh = u[3];
+
+	I = par[0];
+	eps = par[1];
+	v0 = par[2];
+	k = par[3];
+	m = par[5];
+	
+	x2 = x*x;
+	E = exp(-k*(x-v0));
+	Einv = 1./(1.+E);
+
+	fxdx = m*(1.-3.*x2);
+	fxdy = -1.;
+	fydy = -eps;
+	fydx = eps* k*E * Einv*Einv;
+
+	f[0] = m*(x-x2*x)-y+I;
+	f[1] = eps*(Einv-y);
+	f[2] = - fxdx*xh - fydx*yh;
+	f[3] = - fxdy*xh - fydy*yh;
+	"""
+
+	params_txt = """
+	par[0] = %lf;
+	par[1] = %lf;
+	par[2] = %lf;
+	par[3] = %lf;
+	par[4] = %lf;
+	par[5] = %lf;
+	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'])
+	
+	autoAdapter.createAutoCode(filename, diffEqs_txt, params_txt, 'adjoint')
 
 
 

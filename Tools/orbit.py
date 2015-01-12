@@ -55,7 +55,7 @@ class orbit(object):
 	
 			if AUTO_ENABLED: # if enabled, find the exact solution
 				t = self.period*np.arange(X.shape[1])/float(X.shape[1]-1)
-				self.write_solution(t, X)
+				self.write_solution(t, X, mode=0)
 				phase, X = self.auto_orbit()
 	
 			# splinefit the trajectory
@@ -70,7 +70,7 @@ class orbit(object):
 	
 
 
-	def write_solution(self, t, X):
+	def write_solution(self, t, X, mode=0): # mode=0: orbit, mode=1: adjoint
 		f = open('orbit.dat', 'w+')
 		(dim, N) = X.shape
 
@@ -79,10 +79,18 @@ class orbit(object):
 			for j in xrange(dim):
 				string += '\t'+repr(X[j, i])
 
+			if mode:
+				for j in xrange(dim):
+					string += '\t1.'
+
 			f.write(string+'\n')
 
 		f.close()
-		autoAdapter.writeConstantsFile('c.orbit', NDIM=dim, NTST=64)
+
+		if mode:	mode = 'adjoint'
+		else:		mode = 'orbit'
+
+		autoAdapter.writeConstantsFile('c.orbit', NDIM=dim, NTST=256, mode=mode)
 
 
 
@@ -91,7 +99,7 @@ class orbit(object):
 		solution = auto.run('orbit')(2)	# the last label
 		self.period = solution["p"](11)	# save new period
 		tX = np.array(solution.toArray())
-		phase = 2.*np.pi*tX[:, 0]
+		phase = tl.PI2*tX[:, 0]
 		X = tX[:, 1:] # save new solution
 		return phase, np.transpose(X)
 
