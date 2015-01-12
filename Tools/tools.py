@@ -24,7 +24,7 @@ PI2 = 2.*pi
 lib.crossings.argtypes = [ct.POINTER(ct.c_double), ct.c_uint, ct.POINTER(ct.c_double), ct.c_double]
 def crossings(x, threshold):
 	x = np.array(x)
-	ti = x.size*np.ones((x.size/2), float)	 # this is definitively the maximum number of possible crossings
+	ti = x.size*np.ones((1+x.size/2), float)	 # this is definitively the maximum number of possible crossings
 
 	lib.crossings(x.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_uint(x.size),
 		ti.ctypes.data_as(ct.POINTER(ct.c_double)),

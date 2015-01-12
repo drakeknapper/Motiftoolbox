@@ -33,16 +33,41 @@ void derivs_one(double* y, double* dxdt, const double* p)
 }
 
 
+void integrate_one_rk4_nosave(double* y, const double* params, const double dt, const unsigned N)
+{
+	unsigned i, j, k;
+	double dt2, dt6;
+	double y1[N_EQ1], y2[N_EQ1], k1[N_EQ1], k2[N_EQ1], k3[N_EQ1], k4[N_EQ1];
+
+	dt2 = dt/2.; dt6 = dt/6.;
+
+	for(i=0; i<N; i++)
+	{
+		derivs_one(y, k1, params);
+		for(k=0; k<N_EQ1; k++) y1[k] = y[k]+k1[k]*dt2; 			
+		derivs_one(y1, k2, params);
+		for(k=0; k<N_EQ1; k++) y2[k] = y[k]+k2[k]*dt2; 			
+		derivs_one(y2, k3, params);
+		for(k=0; k<N_EQ1; k++) y2[k] = y[k]+k3[k]*dt; 			
+		derivs_one(y2, k4, params);
+		for(k=0; k<N_EQ1; k++) y[k] += dt6*(k1[k]+2.*(k2[k]+k3[k])+k4[k]);
+	}
+}
+
+
 void integrate_one_rk4(double* y, const double* params, double* output, const double dt, const unsigned N, const unsigned stride)
 {
 	unsigned i, j, k;
 	double dt2, dt6;
 	double y1[N_EQ1], y2[N_EQ1], k1[N_EQ1], k2[N_EQ1], k3[N_EQ1], k4[N_EQ1];
-	dt2 = dt/2.; dt6 = dt/6.;
 
+	dt2 = dt/2.; dt6 = dt/6.;
 	for(j=0; j<N_EQ1; j++) output[j] = y[j];
-	for(i=1; i<N; i++) {
-		for(j=0; j<stride; j++) {
+
+	for(i=1; i<N; i++)
+	{
+		for(j=0; j<stride; j++)
+		{
 			derivs_one(y, k1, params);
 			for(k=0; k<N_EQ1; k++) y1[k] = y[k]+k1[k]*dt2; 			
 			derivs_one(y1, k2, params);
