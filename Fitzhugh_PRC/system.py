@@ -193,12 +193,10 @@ class system(win.window, prcNetwork.prcNetwork):
 	
 		try:
 			self.compute_prc(kick=0.01, N_integrate=10**4) # also computes orbit
-
 			self.tx_state_space.set_text("")
 	
 		except:
 			self.tx_state_space.set_text("No closed orbit found!")
-			pass
 		
 		phi = np.arange(500)/float(499.)
 
@@ -213,10 +211,11 @@ class system(win.window, prcNetwork.prcNetwork):
 		self.li_prc1_traj.set_data(tl.adjustForPlotting(phi, X[0], ratio=xscale/yscale, threshold=0.03*xscale))
 		self.li_prc2.set_data(tl.adjustForPlotting(phi, PRC[1], ratio=xscale/yscale, threshold=0.03*xscale))
 		self.li_prc2_traj.set_data(tl.adjustForPlotting(phi, X[1], ratio=xscale/yscale, threshold=0.03*xscale))
+		self.ax_prc1.set_ylim(min(PRC[0]), max(PRC[0]))
+		self.ax_prc2.set_ylim(min(PRC[1]), max(PRC[1]))
 		
 
 		self.fig.canvas.draw()
-
 		try:	self.torus.vectorField_prc()
 		except: pass
 
@@ -233,7 +232,7 @@ class system(win.window, prcNetwork.prcNetwork):
 
 
 	def N_output(self, CYCLES):
-		return int(CYCLES*self.orbit_period/self.dt)
+		return int(CYCLES*self.period/self.dt)
 
 
 	def off_button(self, event):

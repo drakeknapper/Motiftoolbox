@@ -16,15 +16,28 @@ class torus(torus_2D.torus_2D):
 	figsize = (13, 6.5)
 
 	def __init__(self, system, network, traces, info=None, position=None):
-                torus_2D.torus_2D.__init__(self, system, network, traces, info, position)
 
+                torus_2D.torus_2D.__init__(self, system, network, traces, info, position)
+		self.quiver = None
+
+
+	def erase_traces(self):
+		torus_2D.torus_2D.erase_traces(self)
+
+		if self.quiver:
+			self.quiver.remove()
+			self.quiver = None
                 
 
 	def vectorField_prc(self):
 
+		self.erase_traces()
+
 		phase, coupling = self.system.threeCellCoupling(0.05)
 		coupling_function = prcNetwork.interp_torus_vec(phase, phase, coupling)
-		coupling_function.plot(self.GRID)
+		self.quiver = coupling_function.plot(self.GRID, self.ax_traces)
+
+		self.fig.canvas.draw()
 
 
 
@@ -35,17 +48,19 @@ class torus(torus_2D.torus_2D):
 
 if __name__ == "__main__":
 
+	import pylab as pl
 	import system as sys
 	import network3N as netw
 	import traces as tra
 	import info as nf
 		
 	info = nf.info()
-	system = sys.system()
+	system = sys.system(info=info)
 	network = netw.network(info=info)
 	traces = tra.traces(system, network, info=info)
 	t = torus(system, network, traces, info=info)
-	system.torus=t
+	system.torus = t
+	t.vectorField_prc()
 
 	pl.show()
 

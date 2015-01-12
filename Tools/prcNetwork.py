@@ -57,14 +57,21 @@ class fixed_point_2d(object):
 
 
 	def plot(self, axis, *args, **kwargs):
+
+		if "period" in kwargs:
+			period = kwargs.pop("period")
+			self.fixedPoint = period/tl.PI2*self.fixedPoint
+		else:
+			period = tl.PI2
+
 		kwargs['mfc'] = self.color
 		kwargs['ms'] = 15.
 		args = (self.symbol)
 		#axis.plot([self.fixedPoint[0]],
 		  	#[self.fixedPoint[1]],
 				#*args, **kwargs)
-		axis.plot([self.fixedPoint[0]-tl.PI2, self.fixedPoint[0], self.fixedPoint[0]+tl.PI2, self.fixedPoint[0]-tl.PI2, self.fixedPoint[0], self.fixedPoint[0]+tl.PI2, self.fixedPoint[0]-tl.PI2, self.fixedPoint[0], self.fixedPoint[0]+tl.PI2],
-		  	[self.fixedPoint[1]+tl.PI2, self.fixedPoint[1]+tl.PI2, self.fixedPoint[1]+tl.PI2, self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1]-tl.PI2, self.fixedPoint[1]-tl.PI2, self.fixedPoint[1]-tl.PI2],
+		axis.plot([self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period, self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period, self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period],
+		  	[self.fixedPoint[1]+period, self.fixedPoint[1]+period, self.fixedPoint[1]+period, self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1]-period, self.fixedPoint[1]-period, self.fixedPoint[1]-period],
 				*args, **kwargs)
 
 
@@ -107,28 +114,42 @@ class interp_torus_vec(object):
 
 
 
-	def plot(self, GRID=10):
-		phase = self.pi2*np.arange(GRID)/float(GRID-1)
+	def plot(self, GRID=10, ax=None, **kwargs):
+
+		NEWAXIS = False
+		if ax == None:
+			from pylab import figure, show
+			fig = figure()
+			ax = fig.add_subplot(111)
+			NEWAXIS = True
+
+		if "period" in kwargs:
+			period = kwargs.pop("period")
+			self.fixedPoint = period/tl.PI2*self.fixedPoint
+		else:
+			period = tl.PI2
+
+
+		phase = tl.PI2*np.arange(GRID)/float(GRID-1)
+		X, Y = np.meshgrid(phase, phase)
 		UV = np.asarray([[self([phase[j], phase[i]])
 					for i in xrange(GRID)]
 					for j in xrange(GRID)])
 
-		X, Y = meshgrid(phase, phase)
-		U = UV[:, :, 1]
-		V = UV[:, :, 0]
+		U, V = UV[:, :, 1], UV[:, :, 0]
 	
-		figure()
-		ax = subplot(111)
-		Q = quiver(X, Y, U, V, units='width')
+		Q = ax.quiver(X/period, Y/period, U, V, units='width')
 
 		for fp in self.fixedPoints:
-			fp.plot(axis=ax)
+			fp.plot(axis=ax, period=period)
 			
-		xlim(0, self.pi2)
-		ylim(0, self.pi2)
-		tight_layout()
-		show()
+		if NEWAXIS:
+			ax.set_xlim(0., 1.)
+			ax.set_ylim(0., 1.)
+			fig.tight_layout()
+			show()
 
+		return Q
 
 
 
