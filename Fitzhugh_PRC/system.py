@@ -17,7 +17,7 @@ class system(win.window, prcNetwork.prcNetwork):
 	figsize = (6, 12)
 	debug = False
 
-	def __init__(self, info=None, position=None, network=None, traces=None):
+	def __init__(self, info=None, position=None, network=None, traces=None, torus=None):
 		prcNetwork.prcNetwork.__init__(self, model)
 		win.window.__init__(self, position)
 
@@ -26,6 +26,7 @@ class system(win.window, prcNetwork.prcNetwork):
 		self.info = info
 		self.network = network
 		self.traces = traces
+		self.torus = torus
 
 		### state space
 
@@ -215,6 +216,9 @@ class system(win.window, prcNetwork.prcNetwork):
 		
 
 		self.fig.canvas.draw()
+
+		try:	self.torus.vectorField_prc()
+		except: pass
 
 		try:	self.traces.computeTraces()
 		except: pass

@@ -3,6 +3,7 @@
 import sys
 sys.path.insert(0, '../Tools')
 import fitzhugh as model
+import prcNetwork
 import torus_2D
 import numpy as np
 
@@ -16,7 +17,16 @@ class torus(torus_2D.torus_2D):
 
 	def __init__(self, system, network, traces, info=None, position=None):
                 torus_2D.torus_2D.__init__(self, system, network, traces, info, position)
+
                 
+
+	def vectorField_prc(self):
+
+		phase, coupling = self.system.threeCellCoupling(0.05)
+		coupling_function = prcNetwork.interp_torus_vec(phase, phase, coupling)
+		coupling_function.plot(self.GRID)
+
+
 
 
 	
@@ -26,15 +36,16 @@ class torus(torus_2D.torus_2D):
 if __name__ == "__main__":
 
 	import system as sys
-	import network as netw
+	import network3N as netw
 	import traces as tra
 	import info as nf
 		
-	i = nf.info()
-	s = sys.system(info=i)
-	n = netw.network(info=i)
-	t = tra.traces(s, n, info=i)
-	tor = torus(s, n, t, info=i)
+	info = nf.info()
+	system = sys.system()
+	network = netw.network(info=info)
+	traces = tra.traces(system, network, info=info)
+	t = torus(system, network, traces, info=info)
+	system.torus=t
 
 	pl.show()
 
