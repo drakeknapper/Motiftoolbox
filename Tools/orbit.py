@@ -122,12 +122,11 @@ class orbit(object):
 
 
 	def closestPhase(self, state, phaseGuess=0.):
-		self.find_orbit()
 
 		def distance(phase):
-			return np.sqrt( ((self.evaluate_orbit(phase[0])-state)**2.).sum() )
+			return np.max( np.abs(self.evaluate_orbit(phase[0])-state) )
 
-		return opt.fmin(distance, [phaseGuess])[0]
+		return opt.fmin(distance, [phaseGuess], disp=0)[0]
 
 
 
@@ -165,12 +164,13 @@ if __name__ == '__main__':
 
 	phi = np.arange(0., 2.*np.pi+0.01, 0.01)
 	X = orb.evaluate_orbit(phi)
-	subplot(211)
-	plot(phi, X[0], 'k-')
-	subplot(212)
-	plot(phi, X[1], 'k-')
-	show()
-	exit(0)
+	#subplot(211)
+	#plot(phi, X[0], 'k-')
+	#subplot(212)
+	#plot(phi, X[1], 'k-')
+	#show()
+	#exit(0)
+	plot(X[1], X[0])
 	plot([state[1]], [state[0]], 'ko')
 	plot([kickedstate[1]], [kickedstate[0]], 'ko')
 	x = orb.evaluate_orbit(bestphase)

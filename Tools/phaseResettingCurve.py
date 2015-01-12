@@ -3,6 +3,7 @@
 import numpy as np
 import tools as tl
 import orbit as orb
+import distribute
 
 class phaseResettingCurve(orb.orbit):
 
@@ -24,7 +25,8 @@ class phaseResettingCurve(orb.orbit):
 		if self.PRC_COMPUTED:	return			# if the PRC has already been computed, do nothing
 		self.find_orbit()
 		
-		if not orb.AUTO_ENABLED:
+		#if not orb.AUTO_ENABLED:	# the alternative is not  yet stable
+		if True:
 			### COMPUTE PRC WITH SHIFT AND INTEGRATION ###
 			phase, shiftedStates = self.shifted_orbit(kick=kick)	# copies of shifted orbits separate for each dimension
 			shiftedStates = np.concatenate(shiftedStates)		# make one long set of initial values
@@ -40,8 +42,13 @@ class phaseResettingCurve(orb.orbit):
 			phase = np.concatenate((phase, [2.*np.pi]))	# full circle
 			for dim in xrange(self.dimensions): # compute phases from iterated kicked states
 				iSdim = iterStates[dim]
-				kickedPhase = [self.closestPhase(iSdim[i], phase[i]) for i in xrange(iSdim.shape[0])]
-				PRC_i = (np.asarray(kickedPhase)-phase[:-1])/kick
+
+				def findClosest(i):	# function to parallelize minimization
+					return self.closestPhase(iSdim[i], phase[i])
+
+				kickedPhase = np.asarray(distribute.distribute(findClosest, 'i', xrange(iSdim.shape[0])))
+
+				PRC_i = (kickedPhase-phase[:-1])/kick
 				PRC_i = np.concatenate((PRC_i, [PRC_i[0]]))
 				self.prcurve[dim].makeModel(PRC_i, phase)
 
@@ -99,7 +106,10 @@ if __name__ == '__main__':
 
 	import fitzhugh as model
 	from pylab import *
+	import time
 
 	prc = phaseResettingCurve(model)
+	t0 = time.time()
 	prc.compute_prc()
+	print 'elapsed :', time.time()-t0
 	prc.show()
