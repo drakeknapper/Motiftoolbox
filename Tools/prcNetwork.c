@@ -4,35 +4,6 @@
 #include <stdlib.h>
 
 
-void trapz_twoCell(double* Q, double* K, const unsigned N, const double dx, double* result)
-{
-	unsigned i, j, ij;
-	double sum;
-	double F[N*N];
-
-	// set up the integrand
-	for(i=0; i<N; i++)		// phi_1
-	{
-		for(j=0; j<N; j++)	// phi_2
-		{
-			F[i*N+j] = Q[i]*K[N*i+j]-Q[j]*K[N*j+i];	// F(phi_1, phi_2)
-		}
-	}
-
-	// trapz integration
-	for(i=0; i<N; i++)	// dphi index
-	{
-		for(j=0; j<N; j++)	// phi index (integration variable)
-		{
-			ij = fmod(j-i, N);	// phi_2 = dphi+phi
-			sum = ( (double)j*sum + F[N*j+ij] )/(double)(j+1);
-		}
-
-		result[i] = dx*sum;
-	}
-}
-
-
 void memoryError()
 {
 	printf("prcNetwork: Out of memory.");
@@ -40,9 +11,38 @@ void memoryError()
 }
 
 
-void trapz_threeCell(double* Q, double* K, const unsigned N, const double dx, double* result)
+int mod(int a, const int b)
 {
-	unsigned i, j, k, i12, i13, k12, k13, N2=N*N;
+	int c_modulus = a % b;
+	if(c_modulus < 0)
+		return c_modulus + b;
+	else
+		return c_modulus;
+}
+
+
+void trapz_twoCell(double* Q, double* K, const int N, const double dx, double* result)
+{
+	int i, j, ij;
+	double sum, F;
+
+	for(i=0; i<N; i++)	// dphi index
+	{
+		for(j=0; j<N; j++)	// phi index (integration variable)
+		{
+			ij = mod(j-i, N);	// phi_2 = phi-dphi = j - i
+			F = Q[j]*K[N*j+ij]-Q[ij]*K[N*ij+j];	// F(phi, phi-dphi)
+			sum = ( (double)j*sum + dx*F )/(double)(j+1);
+		}
+
+		result[i] = sum;
+	}
+}
+
+
+void trapz_threeCell(double* Q, double* K, const int N, const double dx, double* result)
+{
+	int i, j, k, i12, i13, k12, k13, N2=N*N;
 	double F1, sum12, sum13;
 	double *F12, *F13;
 
@@ -70,8 +70,8 @@ void trapz_threeCell(double* Q, double* K, const unsigned N, const double dx, do
 		{
 			for(k=0; k<N; k++)	// phi index (integration variable)
 			{
-				k12 = fmod(k-i12, N);	// phi - dphi12
-				k13 = fmod(k-i13, N);	// phi - dphi13
+				k12 = mod(k-i12, N);	// phi - dphi12
+				k13 = mod(k-i13, N);	// phi - dphi13
 				sum12 = ((double)k*sum12 + F12[k*N2+k12*N+k13]) / (double)(k+1);
 				sum13 = ((double)k*sum13 + F13[k*N2+k12*N+k13]) / (double)(k+1);
 			}

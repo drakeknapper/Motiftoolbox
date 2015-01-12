@@ -4,6 +4,7 @@ import ctypes as ct
 import numpy as np
 import tools as tl
 import scipy.optimize as opt
+import autoAdapter
 import os
 
 try:
@@ -224,16 +225,15 @@ def integrate_one_rk4(initial_state, dt, N_integrate, stride=42):
 				ct.c_double(dt), ct.c_uint(N_integrate), ct.c_uint(stride))
 	return np.reshape(X_out, (N_EQ1, N_integrate), 'F')
 
-
-INITIAL_ORBIT = np.array([-0.66570294, -1.07775077])
+INITIAL_ORBIT = np.array([-0.62376542, 0.00650901])
 dt = 0.05
-stride = 10
+stride = 100
 N_integrate = 5*10**4
 IDX_THRESHOLD = 0
 THRESHOLD = 0.
 
 
-def single_orbit(DT_ORBIT=0.05, N_ORBIT=5*10**4, STRIDE_ORBIT=10, V_threshold=0., verbose=0):
+def single_orbit(DT_ORBIT=dt, N_ORBIT=N_integrate, STRIDE_ORBIT=10, V_threshold=0., verbose=0):
 
 	X = integrate_one_rk4(INITIAL_ORBIT, DT_ORBIT/float(STRIDE_ORBIT), N_ORBIT, STRIDE_ORBIT)
 	x_raw, y = X[0], X[1]
@@ -365,6 +365,24 @@ def g_critical(I):
 
 
 
+def createAutoCode(filename):
+
+	diffEqs = """
+	f[0] = par[5]*(u[0]-u[0]*u[0]*u[0])-u[1]+par[0];
+	f[1] = par[1]*(1./(1.+exp(-par[3]*(u[0]-par[2])))-u[1]);
+	"""
+
+	params_txt = """
+	par[0] = %lf;
+	par[1] = %lf;
+	par[2] = %lf;
+	par[3] = %lf;
+	par[4] = %lf;
+	par[5] = %lf;
+	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'])
+	
+	autoAdapter.createAutoCode(filename, diffEqs, params_txt)
+
 
 
 
@@ -374,6 +392,8 @@ if __name__ == '__main__':
 	import tools
 	import time
 
+	#createAutoCode('test.c')
+	#exit(0)
 
         #print g_critical(I=0.5)
         #exit(0)

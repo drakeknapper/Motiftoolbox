@@ -3,6 +3,16 @@
 import numpy as np
 import tools as tl
 import scipy.optimize as opt
+import autoAdapter
+
+try:
+	import auto
+	import parseS
+	AUTO_ENABLED = True
+except:
+	AUTO_ENABLED = False
+
+print "# AUTO_ENABLED", AUTO_ENABLED
 
 
 class orbit(object):
@@ -38,18 +48,52 @@ class orbit(object):
 		try:
 			ni = tl.crossings(X[self.model.IDX_THRESHOLD], self.model.THRESHOLD) # convert to millivolts
 			X = X[:, ni[-2]:ni[-1]]
-			phase = tl.PI2*np.arange(X.shape[1])/float(X.shape[1]-1)
 	
-			for i in xrange(self.dimensions):
-				self.trajectory[i].makeModel(X[i], phase)
-
 			self.period = self.dt*(ni[-1]-ni[-2])
 
-			self.ORBIT_COMPUTED = True
+			phase = tl.PI2*np.arange(X.shape[1])/float(X.shape[1]-1)
+	
+			if AUTO_ENABLED: # if enabled, find the exact solution
+				t = self.period*np.arange(X.shape[1])/float(X.shape[1]-1)
+				self.write_solution(t, X)
+				phase, X = self.auto_orbit()
+	
+			# splinefit the trajectory
+			for i in xrange(self.dimensions):
+				self.trajectory[i].makeModel(X[i], phase)
 		
+			self.ORBIT_COMPUTED = True
+			
 		except:
 			print '# single_orbit:  No closed orbit found!'
 			raise ValueError
+	
+
+
+	def write_solution(self, t, X):
+		f = open('orbit.dat', 'w+')
+		(dim, N) = X.shape
+
+		for i in xrange(N):
+			string = repr(t[i])
+			for j in xrange(dim):
+				string += '\t'+repr(X[j, i])
+
+			f.write(string+'\n')
+
+		f.close()
+		autoAdapter.writeConstantsFile('c.orbit', NDIM=dim, NTST=64)
+
+
+
+	def auto_orbit(self):
+		self.model.createAutoCode('orbit.c')
+		solution = auto.run('orbit')(2)	# the last label
+		self.period = solution["p"](11)	# save new period
+		tX = np.array(solution.toArray())
+		phase = 2.*np.pi*tX[:, 0]
+		X = tX[:, 1:] # save new solution
+		return phase, np.transpose(X)
 
 
 
@@ -105,18 +149,23 @@ if __name__ == '__main__':
 	orb.find_orbit()
 
 	phase = 1.0
-	state = orb(phase)
+	state = orb.evaluate_orbit(phase)
 	kickedstate = state.copy()
 	kickedstate[1] = kickedstate[1]+0.1
 
 	bestphase = orb.closestPhase(kickedstate, phase-0.3)
 
 	phi = np.arange(0., 2.*np.pi+0.01, 0.01)
-	X = orb(phi)
-	plot(X[1], X[0], 'k-')
+	X = orb.evaluate_orbit(phi)
+	subplot(211)
+	plot(phi, X[0], 'k-')
+	subplot(212)
+	plot(phi, X[1], 'k-')
+	show()
+	exit(0)
 	plot([state[1]], [state[0]], 'ko')
 	plot([kickedstate[1]], [kickedstate[0]], 'ko')
-	x = orb(bestphase)
+	x = orb.evaluate_orbit(bestphase)
 	plot([x[1]], [x[0]], 'rs')
 
 	show()

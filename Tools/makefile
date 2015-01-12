@@ -82,4 +82,4 @@ lib:
 
 
 clean:
-	rm -rf *.o *.pyc lib
+	rm -rf *.o *.pyc lib orbit.c orbit.exe c.orbit orbit.dat fort.7 fort.8 fort.9

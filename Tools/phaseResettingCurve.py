@@ -4,7 +4,6 @@ import numpy as np
 import tools as tl
 import orbit as orb
 
-
 class phaseResettingCurve(orb.orbit):
 
 	N_PRC = 256
@@ -20,7 +19,7 @@ class phaseResettingCurve(orb.orbit):
 
 
 
-	def compute_prc(self, kick=0.005, N_integrate=10**4):
+	def compute_prc(self, kick=0.01, N_integrate=10**4):
 
 		if self.PRC_COMPUTED:
 			return
@@ -31,16 +30,21 @@ class phaseResettingCurve(orb.orbit):
 		dt = self.period/float(N_integrate)
 	
 		# integrate the shifted trajectories!
-		if self.model.CUDA_ENABLED:	iterStates = self.model.cuda_integrate_one_rk4_nosave(shiftedStates, dt, N_integrate)
-		else:				iterStates = np.array([self.model.integrate_one_rk4_nosave(shiftedStates[i], dt, N_integrate) for i in xrange(O.shape[1])])
+		if self.model.CUDA_ENABLED:
+			iterStates = self.model.cuda_integrate_one_rk4_nosave(shiftedStates, dt, N_integrate)
+		else:	
+			iterStates = np.array([self.model.integrate_one_rk4_nosave(shiftedStates[i], dt, N_integrate) for i in xrange(shiftedStates.shape[0])])
 
-		iterStates = [iterStates[i*self.N_PRC:(i+1)*self.N_PRC] for i in xrange(self.dimensions)]
+		iterStates = [iterStates[i*self.N_PRC:(i+1)*self.N_PRC] for i in xrange(self.dimensions)]	# divide into the dimensions again
 
-		kickedPhases = []
+
+		phase = np.concatenate((phase, [2.*np.pi]))	# full circle
 		for dim in xrange(self.dimensions): # compute phases from iterated kicked states
 			iSdim = iterStates[dim]
-			kickedPhase = np.array([self.closestPhase(iSdim[i], phase[i]) for i in xrange(iSdim.shape[0])])
-			self.prcurve[dim].makeModel((kickedPhase-phase)/kick, phase)
+			kickedPhase = [self.closestPhase(iSdim[i], phase[i]) for i in xrange(iSdim.shape[0])]
+			PRC_i = (np.asarray(kickedPhase)-phase[:-1])/kick
+			PRC_i = np.concatenate((PRC_i, [PRC_i[0]]))
+			self.prcurve[dim].makeModel(PRC_i, phase)
 
 		self.PRC_COMPUTED = True
 
