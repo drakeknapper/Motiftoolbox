@@ -125,6 +125,12 @@ if CUDA_ENABLED:
 		N_initials = initial_states.size/N_EQ3 # initial states / state variables = initial conditions
 	
 		coupling = np.asarray(coupling)
+		# coupling[0] : 2 -> 1
+		# coupling[1] : 3 -> 1
+		# coupling[2] : 1 -> 2
+		# coupling[3] : 3 -> 2
+		# coupling[4] : 1 -> 3
+		# coupling[5] : 2 -> 3
 	
 		X_out = np.zeros((3*N_initials*N_integrate), float) # save only one per oscillator per time
 		p = parameters_three()

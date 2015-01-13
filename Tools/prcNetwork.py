@@ -14,24 +14,26 @@ import os
 lib = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_prcNetwork.so')
 
 
-lib.trapz_twoCell.argtypes = [ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.c_int, ct.c_double, ct.POINTER(ct.c_double)]
-def trapz_twoCell(Q, K, dphi):
-	Q, K = np.array(Q),  np.array(K)
+lib.trapz_twoCell.argtypes = [ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.c_int, ct.POINTER(ct.c_double), ct.c_double, ct.POINTER(ct.c_double)]
+def trapz_twoCell(Q, K, dphi, strength):
+	# strenght[0] : 2 -> 1
+	# strenght[1] : 1 -> 2
+	Q, K, strength = np.array(Q),  np.array(K), np.array(strength)
 	result = np.zeros((Q.size), float)
 
 	lib.trapz_twoCell(Q.ctypes.data_as(ct.POINTER(ct.c_double)), K.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_int(Q.size),
-			ct.c_double(dphi), result.ctypes.data_as(ct.POINTER(ct.c_double)))
+			strength.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_double(dphi), result.ctypes.data_as(ct.POINTER(ct.c_double)))
 	
 	return result
 
 
-lib.trapz_threeCell.argtypes = [ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.c_int, ct.c_double, ct.POINTER(ct.c_double)]
-def trapz_threeCell(Q, K, dphi):
-	Q, K = np.array(Q), np.array(K)
+lib.trapz_threeCell.argtypes = [ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.c_int, ct.POINTER(ct.c_double), ct.c_double, ct.POINTER(ct.c_double)]
+def trapz_threeCell(Q, K, dphi, strength):
+	Q, K, strength = np.array(Q), np.array(K), np.array(strength)
 	result = np.zeros((2, Q.size, Q.size), float)
 
-	lib.trapz_threeCell(Q.ctypes.data_as(ct.POINTER(ct.c_double)), K.ctypes.data_as(ct.POINTER(ct.c_double)),
-				ct.c_int(Q.size), ct.c_double(dphi), result.ctypes.data_as(ct.POINTER(ct.c_double)))
+	lib.trapz_threeCell(Q.ctypes.data_as(ct.POINTER(ct.c_double)), K.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_int(Q.size),
+			strength.ctypes.data_as(ct.POINTER(ct.c_double)), ct.c_double(dphi), result.ctypes.data_as(ct.POINTER(ct.c_double)))
 
 	return result
 
@@ -88,7 +90,7 @@ class interp_torus_vec(object):
 				for i in xrange(self.dimensions)]
 
 	def __call__(self, XY):
-		X, Y = np.mod(XY[0], self.pi2), np.mod(XY[1], self.pi2)
+		X, Y = np.mod(XY[0], self.pi2), np.mod(XY[1], self.pi2)	# X : dphi12, Y : dphi13
 		return [self.f[i](X, Y)[0, 0] for i in xrange(self.dimensions)]
 	
 
@@ -110,7 +112,7 @@ class interp_torus_vec(object):
 						eigenvalues =  scipy.linalg.eigvals(jac)
 						self.fixedPoints.append( fixed_point_2d(x=sol.x, eigenvalues=np.real(eigenvalues)) )
 				except:
-					print "phi =", [phase[i], phase[j]], "failed"
+					print "findRoots :\tphi =", [phase[i], phase[j]], "failed."
 
 
 
@@ -125,27 +127,27 @@ class interp_torus_vec(object):
 
 		if "period" in kwargs:
 			period = kwargs.pop("period")
-			self.fixedPoint = period/tl.PI2*self.fixedPoint
 		else:
 			period = tl.PI2
 
 
 		phase = tl.PI2*np.arange(GRID)/float(GRID-1)
-		X, Y = np.meshgrid(phase, phase)
-		UV = np.asarray([[self([phase[j], phase[i]])
-					for i in xrange(GRID)]
-					for j in xrange(GRID)])
+		phase += phase[1]/2.
+		UV = np.asarray([ [self([phase[j], phase[i]]) for i in xrange(GRID)]	# Spalten
+								for j in xrange(GRID)])	# Zeilen
 
+
+		X, Y = np.meshgrid(phase, phase)
 		U, V = UV[:, :, 1], UV[:, :, 0]
 	
-		Q = ax.quiver(X/period, Y/period, U, V, units='width')
+		Q = ax.quiver(period*X/tl.PI2, period*Y/tl.PI2, U, V, units='width')
 
 		for fp in self.fixedPoints:
 			fp.plot(axis=ax, period=period)
 			
 		if NEWAXIS:
-			ax.set_xlim(0., 1.)
-			ax.set_ylim(0., 1.)
+			ax.set_xlim(0., period)
+			ax.set_ylim(0., period)
 			fig.tight_layout()
 			show()
 
@@ -178,19 +180,19 @@ class prcNetwork(prc.phaseResettingCurve):
 
 
 
-	def twoCellCoupling(self, dphi):
+	def twoCellCoupling(self, dphi, strength = np.ones((2), float)):
 		phase, Q, K = self.getCouplingFunctions(dphi)
 
-		integral = trapz_twoCell(Q, K, dphi)
+		integral = trapz_twoCell(Q, K, dphi, strength)
 
 		return phase, integral
 
 
 
-	def threeCellCoupling(self, dphi):
-		phase, Q, K = self.getCouplingFunctions(dphi)
+	def threeCellCoupling(self, dphi, strength=np.ones((6), float)):
+		phase, Q, K = self.getCouplingFunctions(dphi)	# phase range, Q[j]=Q(phi_j), K[i, j]=K(phi_i, phi_j)
 
-		integral = trapz_threeCell(Q, K, dphi)
+		integral = trapz_threeCell(Q, K, dphi, strength)
 
 		return phase, integral
 
@@ -220,15 +222,17 @@ if __name__ == '__main__':
 	model.setParams(I=0.6, epsilon=0.1);
 	net = prcNetwork(model)
 
-	figure()
-	phase, coupling = net.twoCellCoupling(0.05)
-	plot(phase, coupling, 'ko')
-	tight_layout()
+	ratio = 0.3
+
+	#figure()
+	#phase, coupling = net.twoCellCoupling(0.05, strength=[1., ratio])
+	#plot(phase, coupling, 'ko')
+	#tight_layout()
 	
 	phase, coupling = net.threeCellCoupling(0.05)
 	#phase, coupling = phase[::50], coupling[:, ::50, ::50]
-	coupling_function = interp_torus_vec(phase, phase, coupling)
-	coupling_function.findRoots(GRID=20)
+	coupling_function = interp_torus_vec(phase, phase, coupling) # dphi12, dphi13, coupling=[q12, q13]
+	#coupling_function.findRoots(GRID=20)
 	coupling_function.plot()
 
 	
