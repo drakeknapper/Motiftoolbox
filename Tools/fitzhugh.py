@@ -231,15 +231,16 @@ def integrate_one_rk4(initial_state, dt, N_integrate, stride=42):
 				ct.c_double(dt), ct.c_uint(N_integrate), ct.c_uint(stride))
 	return np.reshape(X_out, (N_EQ1, N_integrate), 'F')
 
+
+
 INITIAL_ORBIT = np.array([-0.62376542, 0.00650901])
 dt = 0.05
 stride = 100
-N_integrate = 5*10**4
+N_integrate = 5*10**5
 IDX_THRESHOLD = 0
 THRESHOLD = 0.
 
-
-def single_orbit(DT_ORBIT=dt, N_ORBIT=N_integrate, STRIDE_ORBIT=10, V_threshold=0., verbose=0):
+def single_orbit(DT_ORBIT=dt, N_ORBIT=N_integrate, STRIDE_ORBIT=stride, V_threshold=THRESHOLD, verbose=0):
 
 	X = integrate_one_rk4(INITIAL_ORBIT, DT_ORBIT/float(STRIDE_ORBIT), N_ORBIT, STRIDE_ORBIT)
 	x_raw, y = X[0], X[1]

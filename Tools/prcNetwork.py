@@ -3,7 +3,7 @@
 import numpy as np
 import tools as tl
 import phaseResettingCurve as prc
-import attractor as att
+import distribute
 
 import scipy.interpolate
 import scipy.optimize as opt
@@ -39,41 +39,58 @@ def trapz_threeCell(Q, K, dphi, strength):
 
 
 
+def phase_difference(x, y, period):
+	period2 = 0.5*period
+	return np.mod(x-y+period2, period)-period2
 
-class fixed_point_2d(object):
+
+def phase_distance(x, y, period):
+	return np.sqrt(np.sum(phase_difference(x, y, period)**2))
+
+
+class fixedPoint_torus(object):
+
+	stability = [['sink', 'o'], ['source', 'x'], ['saddle', 'd']]
 
 	def __init__(self, x, eigenvalues):
-		self.fixedPoint = asarray(x)
-		self.eigenValues = asarray(eigenvalues)
-		self.color = tl.clmap(self.fixedPoint[1], self.fixedPoint[0])
+		self.fp = np.mod(np.asarray(x), tl.PI2)
+		self.eigenValues = np.asarray(eigenvalues)
+		self.color = tl.clmap(self.fp[1], self.fp[0])
+
 		if np.prod(self.eigenValues) < 0.:
-			self.symbol = 'd'
+			self.stability_idx = 2 # saddle
+
 		elif all(self.eigenValues > 0.):
-			self.symbol = 's'
+			self.stability_idx = 1 # source
+
+		elif all(self.eigenValues < 0.):
+			self.stability_idx = 0 # sink
+
 		else:
-			self.symbol = 'o'
+			self.stability_idx = 'undefined'
 
 
-	def distance2fixedPoint(self, other):
-		return att.phase_distance(self.fixedPoint, other)
+	def distance2(self, other):
+		return phase_distance(self.fp, other.fp, period=tl.PI2)
 
 
 	def plot(self, axis, *args, **kwargs):
 
-		if "period" in kwargs:
+		if self.stability_idx == 'undefined': return
+
+		if 'period' in kwargs:
 			period = kwargs.pop("period")
-			self.fixedPoint = period/tl.PI2*self.fixedPoint
+			self.fp = period/tl.PI2*self.fp
 		else:
 			period = tl.PI2
 
-		kwargs['mfc'] = self.color
-		kwargs['ms'] = 15.
-		args = (self.symbol)
-		#axis.plot([self.fixedPoint[0]],
-		  	#[self.fixedPoint[1]],
-				#*args, **kwargs)
-		axis.plot([self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period, self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period, self.fixedPoint[0]-period, self.fixedPoint[0], self.fixedPoint[0]+period],
-		  	[self.fixedPoint[1]+period, self.fixedPoint[1]+period, self.fixedPoint[1]+period, self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1], self.fixedPoint[1]-period, self.fixedPoint[1]-period, self.fixedPoint[1]-period],
+		if not 'ms' in kwargs:	kwargs['ms'] = 15.
+		if not 'mfc' in kwargs:	kwargs['mfc'] = self.color
+
+		args = (self.stability[self.stability_idx][1])
+
+		axis.plot([self.fp[0]-period, self.fp[0], self.fp[0]+period, self.fp[0]-period, self.fp[0], self.fp[0]+period, self.fp[0]-period, self.fp[0], self.fp[0]+period],
+		  	[self.fp[1]+period, self.fp[1]+period, self.fp[1]+period, self.fp[1], self.fp[1], self.fp[1], self.fp[1]-period, self.fp[1]-period, self.fp[1]-period],
 				*args, **kwargs)
 
 
@@ -81,7 +98,6 @@ class fixed_point_2d(object):
 
 class interp_torus_vec(object):
 
-	pi2 = np.pi*2
 
 	def __init__(self, X, Y, F, **kwargs):
 		self.dimensions = len(F)
@@ -90,30 +106,54 @@ class interp_torus_vec(object):
 				for i in xrange(self.dimensions)]
 
 	def __call__(self, XY):
-		X, Y = np.mod(XY[0], self.pi2), np.mod(XY[1], self.pi2)	# X : dphi12, Y : dphi13
+		X, Y = np.mod(XY[0], tl.PI2), np.mod(XY[1], tl.PI2)	# X : dphi12, Y : dphi13
 		return [self.f[i](X, Y)[0, 0] for i in xrange(self.dimensions)]
 	
 
 
 	def findRoots(self, GRID=10):
 
-		phase = self.pi2*np.arange(GRID)/float(GRID)
-		phase += phase[1]/2.				# shift into the open field (0, 2pi)x(0, 2pi)
+		phase = tl.PI2*np.arange(GRID)/float(GRID)
+		dphi = phase[1]
+		phase += dphi/2.				# shift into the open field (0, 2pi)x(0, 2pi)
 
-		for i in xrange(GRID):
+		### find roots from a grid ###
 
-			for j in xrange(GRID):
+		def findRoot(n):
 
-				try:
-					sol = opt.root(self.__call__, x0=[phase[i], phase[j]], tol=10.**-7, method='broyden2')
-			
-					if sol.success:
-						jac = np.array([scipy.optimize.approx_fprime(sol.x, lambda x: self.f[i](x[0], x[1]), epsilon=0.05)
-									for i in xrange(self.dimensions)])
-						eigenvalues =  scipy.linalg.eigvals(jac)
-						self.fixedPoints.append( fixed_point_2d(x=sol.x, eigenvalues=np.real(eigenvalues)) )
-				except:
-					print "findRoots :\tphi =", [phase[i], phase[j]], "failed."
+			i, j = n/GRID, np.mod(n, GRID)
+
+			try:
+				fp = [[0., 0.], [0., 0.]]
+				sol = opt.root(self.__call__, x0=[phase[i], phase[j]], tol=10.**-11, method='broyden2')
+
+				if sol.success:
+					jac = np.array([scipy.optimize.approx_fprime(sol.x, lambda x: self.f[i](x[0], x[1]), epsilon=0.25*dphi)
+								for i in xrange(self.dimensions)])
+					eigenvalues =  scipy.linalg.eigvals(jac)
+
+					if not any([eigen == 0. for eigen in eigenvalues]):
+						fp = [sol.x, np.real(eigenvalues)]
+
+
+			except:
+				pass
+
+			return fp
+
+		fps = distribute.distribute(findRoot, 'n', np.arange(GRID**2))
+
+		fixedPoints = [fixedPoint_torus(x=fp[0], eigenvalues=fp[1]) for fp in fps]
+
+
+		### discard doubles ###
+
+		self.fixedPoints = [fixedPoints[0]]
+		for newfp in fixedPoints:
+			conditions = [oldfp.distance2(newfp) > 0.1*dphi for oldfp in self.fixedPoints]
+
+			if all(conditions):
+				self.fixedPoints.append(newfp)
 
 
 
@@ -227,9 +267,9 @@ if __name__ == '__main__':
 	#plot(phase, coupling, 'ko')
 	#tight_layout()
 	
-	phase, coupling = net.threeCellCoupling(0.03)
+	phase, coupling = net.threeCellCoupling(0.01)
 	coupling_function = interp_torus_vec(phase, phase, coupling) # dphi12, dphi13, coupling=[q12, q13]
-	coupling_function.findRoots(GRID=10)
+	coupling_function.findRoots(GRID=15)
 	coupling_function.plot()
 
 	

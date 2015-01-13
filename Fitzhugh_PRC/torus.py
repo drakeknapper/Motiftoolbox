@@ -33,8 +33,9 @@ class torus(torus_2D.torus_2D):
 
 		self.erase_traces()
 
-		phase, coupling = self.system.threeCellCoupling(0.05, self.network.coupling_strength)
+		phase, coupling = self.system.threeCellCoupling(0.03, self.network.coupling_strength)
 		coupling_function = prcNetwork.interp_torus_vec(phase, phase, coupling)
+		coupling_function.findRoots(GRID=self.GRID)
 		self.quiver = coupling_function.plot(self.GRID, self.ax_traces, period=1.)
 
 		self.fig.canvas.draw()

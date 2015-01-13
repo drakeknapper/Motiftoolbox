@@ -90,12 +90,12 @@ class orbit(object):
 		if mode:	mode = 'adjoint'
 		else:		mode = 'orbit'
 
-		autoAdapter.writeConstantsFile('c.orbit', NDIM=dim, NTST=256, mode=mode)
+		autoAdapter.writeConstantsFile('c.orbit', NDIM=dim, NTST=512, mode=mode)
 
 
 
 	def auto_orbit(self):
-		self.model.createAutoCode('orbit.c')
+		self.model.createAutoCode('orbit.c', period=self.period)
 		solution = auto.run('orbit')(2)	# the last label
 		self.period = solution["p"](11)	# save new period
 		tX = np.array(solution.toArray())
