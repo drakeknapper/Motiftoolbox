@@ -57,14 +57,15 @@ class fixedPoint_torus(object):
 		self.eigenValues = np.asarray(eigenvalues)
 		self.color = tl.clmap(self.fp[1], self.fp[0])
 
-		if np.prod(self.eigenValues) < 0.:
-			self.stability_idx = 2 # saddle
+		if all(self.eigenValues < 0.):
+			self.stability_idx = 0 # sink
 
 		elif all(self.eigenValues > 0.):
 			self.stability_idx = 1 # source
 
-		elif all(self.eigenValues < 0.):
-			self.stability_idx = 0 # sink
+		elif np.prod(self.eigenValues) < 0.:
+			self.stability_idx = 2 # saddle
+
 
 		else:
 			self.stability_idx = 'undefined'

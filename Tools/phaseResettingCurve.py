@@ -18,7 +18,11 @@ class phaseResettingCurve(orb.orbit):
 		self.PRC_COMPUTED = False
 		self.prcurve = [tl.splineLS1D(isphase=False) for i in xrange(self.dimensions)]
 
-
+	
+	def setParams(self, **kwargs):
+		orb.orbit.setParams(self, **kwargs)
+		self.PRC_COMPUTED = False
+	
 
 	def compute_prc(self, kick=0.01, N_integrate=10**4):
 

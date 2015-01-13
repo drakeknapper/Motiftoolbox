@@ -37,6 +37,11 @@ class orbit(object):
 		self.N_integrate = model.N_integrate
 
 
+	def setParams(self, **kwargs):
+		self.model.setParams(**kwargs)
+		self.ORBIT_COMPUTED = False
+
+
 	def find_orbit(self):
 
 		if self.ORBIT_COMPUTED:

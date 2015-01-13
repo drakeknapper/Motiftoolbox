@@ -235,8 +235,8 @@ def integrate_one_rk4(initial_state, dt, N_integrate, stride=42):
 
 INITIAL_ORBIT = np.array([-0.62376542, 0.00650901])
 dt = 0.05
-stride = 100
-N_integrate = 5*10**5
+stride = 50
+N_integrate = 2*10**5
 IDX_THRESHOLD = 0
 THRESHOLD = 0.
 
