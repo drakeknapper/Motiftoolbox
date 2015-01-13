@@ -25,7 +25,7 @@ class phaseResettingCurve(orb.orbit):
 		if self.PRC_COMPUTED:	return			# if the PRC has already been computed, do nothing
 		self.find_orbit()
 		
-		#if not orb.AUTO_ENABLED:	# the alternative is not  yet stable
+		#if not orb.AUTO_ENABLED:			# !!!the alternative is not  yet stable!!!
 		if True:
 			### COMPUTE PRC WITH SHIFT AND INTEGRATION ###
 			phase, shiftedStates = self.shifted_orbit(kick=kick)	# copies of shifted orbits separate for each dimension
@@ -57,10 +57,11 @@ class phaseResettingCurve(orb.orbit):
 		else: # if AUTO_ENABLED
 			phase = tl.PI2*np.arange(self.N_PRC)/float(self.N_PRC)
 			X = self.evaluate_orbit(phase)
-			t = self.period/tl.PI2 * phase
-			self.write_solution(t, X, mode=1)	# mode=1: adjoint
-			self.model.createAutoCode2('orbit.c')	# create auto code to solve the adjoint equation as well.
-			solution = orb.auto.run('orbit')(2)	# the last label
+			#t = self.period/tl.PI2 * phase
+			t = 1./tl.PI2 * phase
+			self.write_solution(t, X, mode=1)			# mode=1: adjoint
+			self.model.createAutoCode2('orbit.c', period=self.period)	# create auto code to solve the adjoint equation as well.
+			solution = orb.auto.run('orbit')(2)			# the second label
 			tX = np.array(solution.toArray())
 			phase = tl.PI2*tX[:, 0]
 			PRC = tX[:, 1+self.dimensions:] # save new solution

@@ -365,7 +365,7 @@ def g_critical(I):
 
 
 
-def createAutoCode(filename):
+def createAutoCode(filename, period=1.):
 
 	diffEqs_txt = """
 	f[0] = par[5]*(u[0]-u[0]*u[0]*u[0])-u[1]+par[0];
@@ -373,18 +373,19 @@ def createAutoCode(filename):
 	"""
 
 	params_txt = """
-	par[0] = %lf;
-	par[1] = %lf;
-	par[2] = %lf;
-	par[3] = %lf;
-	par[4] = %lf;
-	par[5] = %lf;
-	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'])
+	par[0] = %lf;	// I		:	shift of fast nullcline
+	par[1] = %lf;	// epsilon	:	time scale separation
+	par[2] = %lf;	// x		:	slow nullcline elevation
+	par[3] = %lf;	// k		:	slow nullcline inclination
+	par[4] = %lf;	// E		:	unused
+	par[5] = %lf;	// m		:	width of the 'Z'
+	par[10] = %lf;	// period
+	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'], period)
 	
 	autoAdapter.createAutoCode(filename, diffEqs_txt, params_txt)
 
 
-def createAutoCode2(filename):
+def createAutoCode2(filename, period=1.):
 
 	diffEqs_txt = """
 	doublereal x, y, xh, yh, m, I, eps, k, v0;
@@ -417,13 +418,14 @@ def createAutoCode2(filename):
 	"""
 
 	params_txt = """
-	par[0] = %lf;
-	par[1] = %lf;
-	par[2] = %lf;
-	par[3] = %lf;
-	par[4] = %lf;
-	par[5] = %lf;
-	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'])
+	par[0] = %lf;	// I		:	shift of fast nullcline
+	par[1] = %lf;	// epsilon	:	time scale separation
+	par[2] = %lf;	// x		:	slow nullcline elevation
+	par[3] = %lf;	// k		:	slow nullcline inclination
+	par[4] = %lf;	// E		:	unused
+	par[5] = %lf;	// m		:	width of the 'Z'
+	par[10] = %lf;	// period
+	""" % (params['I_0'], params['epsilon_0'], params['x_0'], params['k_0'], params['E_0'], params['m_0'], period)
 	
 	autoAdapter.createAutoCode(filename, diffEqs_txt, params_txt, 'adjoint')
 
