@@ -98,13 +98,14 @@ class interp_torus_vec(object):
 	def findRoots(self, GRID=10):
 
 		phase = self.pi2*np.arange(GRID)/float(GRID)
+		phase += phase[1]/2.				# shift into the open field (0, 2pi)x(0, 2pi)
 
 		for i in xrange(GRID):
 
 			for j in xrange(GRID):
 
 				try:
-					sol = opt.root(self.__call__, x0=[phase[i], phase[j]], tol=10**-13, method='broyden2')
+					sol = opt.root(self.__call__, x0=[phase[i], phase[j]], tol=10.**-7, method='broyden2')
 			
 					if sol.success:
 						jac = np.array([scipy.optimize.approx_fprime(sol.x, lambda x: self.f[i](x[0], x[1]), epsilon=0.05)
@@ -133,12 +134,11 @@ class interp_torus_vec(object):
 
 		phase = tl.PI2*np.arange(GRID)/float(GRID-1)
 		phase += phase[1]/2.
-		UV = np.asarray([ [self([phase[j], phase[i]]) for i in xrange(GRID)]	# Spalten
+		UV = np.asarray([ [self([phase[i], phase[j]]) for i in xrange(GRID)]	# Spalten
 								for j in xrange(GRID)])	# Zeilen
 
-
 		X, Y = np.meshgrid(phase, phase)
-		U, V = UV[:, :, 1], UV[:, :, 0]
+		U, V = UV[:, :, 0], UV[:, :, 1]
 	
 		Q = ax.quiver(period*X/tl.PI2, period*Y/tl.PI2, U, V, units='width')
 
@@ -219,20 +219,17 @@ if __name__ == '__main__':
 	from mpl_toolkits.mplot3d import Axes3D
 	import scipy.interpolate as interp
 
-	model.setParams(I=0.6, epsilon=0.1);
+	model.setParams(I=0.42, epsilon=0.3);
 	net = prcNetwork(model)
-
-	ratio = 0.3
 
 	#figure()
 	#phase, coupling = net.twoCellCoupling(0.05, strength=[1., ratio])
 	#plot(phase, coupling, 'ko')
 	#tight_layout()
 	
-	phase, coupling = net.threeCellCoupling(0.05)
-	#phase, coupling = phase[::50], coupling[:, ::50, ::50]
+	phase, coupling = net.threeCellCoupling(0.03)
 	coupling_function = interp_torus_vec(phase, phase, coupling) # dphi12, dphi13, coupling=[q12, q13]
-	#coupling_function.findRoots(GRID=20)
+	coupling_function.findRoots(GRID=10)
 	coupling_function.plot()
 
 	
