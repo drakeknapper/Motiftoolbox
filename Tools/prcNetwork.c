@@ -21,7 +21,7 @@ int mod(int a, const int b)
 }
 
 
-void trapz_twoCell(double* Q, double* K, const int N, const double dx, double* result)
+void trapz_twoCell(double* Q, double* K, const int N, double* strength, const double dx, double* result)
 {
 	int i, j, ij;
 	double sum, F;
@@ -31,7 +31,7 @@ void trapz_twoCell(double* Q, double* K, const int N, const double dx, double* r
 		for(j=0; j<N; j++)	// phi index (integration variable)
 		{
 			ij = mod(j-i, N);	// phi_2 = phi-dphi = j - i
-			F = Q[j]*K[N*j+ij]-Q[ij]*K[N*ij+j];	// F(phi, phi-dphi)
+			F = strength[0]*Q[j]*K[N*j+ij]-strength[1]*Q[ij]*K[N*ij+j];	// F(phi, phi-dphi)
 			sum = ( (double)j*sum + dx*F )/(double)(j+1);
 		}
 
@@ -40,7 +40,7 @@ void trapz_twoCell(double* Q, double* K, const int N, const double dx, double* r
 }
 
 
-void trapz_threeCell(double* Q, double* K, const int N, const double dx, double* result)
+void trapz_threeCell(double* Q, double* K, const int N, double* strength, const double dx, double* result)
 {
 	int i, j, k, i12, i13, k12, k13, N2=N*N;
 	double F1, sum12, sum13;
@@ -56,9 +56,9 @@ void trapz_threeCell(double* Q, double* K, const int N, const double dx, double*
 		{
 			for(k=0; k<N; k++)	// phi_3
 			{
-				F1 = Q[i]*(K[N*i+j]+K[N*i+k]);
-				F12[i*N2+j*N+k] = F1-Q[j]*(K[N*j+i]+K[N*j+k]);	// F_12(phi_i, phi_j, phi_k)
-				F13[i*N2+j*N+k] = F1-Q[k]*(K[N*k+i]+K[N*k+j]);	// F_13(phi_i, phi_j, phi_k)
+				F1 = 		     Q[i]*(strength[0]*K[N*i+j]+strength[1]*K[N*i+k]);	// 2->1 + 3->1 = F1
+				F12[i*N2+j*N+k] = F1-Q[j]*(strength[2]*K[N*j+i]+strength[3]*K[N*j+k]);	// F1 - (1->2 + 3->2)      :  F_12(phi_i, phi_j, phi_k)
+				F13[i*N2+j*N+k] = F1-Q[k]*(strength[4]*K[N*k+i]+strength[5]*K[N*k+j]);	// F1 - (1->3 + 2->3)      :  F_13(phi_i, phi_j, phi_k)
 			}
 		}
 	}
@@ -76,8 +76,8 @@ void trapz_threeCell(double* Q, double* K, const int N, const double dx, double*
 				sum13 = ((double)k*sum13 + F13[k*N2+k12*N+k13]) / (double)(k+1);
 			}
 	
-			result[i12*N+i13]    = dx*sum12;
-			result[i12*N+i13+N2] = dx*sum13;
+			result[i12*N+i13]    = dx*sum12;	// q12(dphi12, dphi13)
+			result[i12*N+i13+N2] = dx*sum13;	// q13(dphi12, dphi13)
 		}
 	}
 	free(F12);
