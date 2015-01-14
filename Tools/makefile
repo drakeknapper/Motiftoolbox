@@ -15,6 +15,7 @@ LDFLAGS=-lm
 
 
 noise: cuda fitzhugh_noise
+	rm *.o
 
 test: allall fitzhugh_cuda
 	rm *.o
@@ -44,8 +45,8 @@ thetax2: thetax2.o lib
 fitzhugh: fitzhugh.o lib
 	gcc -shared fitzhugh.o -o lib/_fitzhugh.so -lm
 
-fitzhugh_noise: fitzhugh_noise.o lib
-	gcc -shared fitzhugh_noise.o -o lib/_fitzhugh_noise.so -lm
+fitzhugh_noise: fitzhugh_noise.o
+	gcc -shared fitzhugh_noise.o -o lib/_fitzhugh_noise.so -lm -lgsl -lgslcblas
 
 plant: plant.o lib
 	gcc -shared plant.o -o lib/_plant.so -lm
