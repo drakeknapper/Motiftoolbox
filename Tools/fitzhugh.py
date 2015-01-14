@@ -7,22 +7,25 @@ import scipy.optimize as opt
 import autoAdapter
 import os
 
+CUDA_ENABLED = False
+NOISE_ENABLED = False
+
 try:
 	lib = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_fitzhugh_cuda.so')
 	CUDA_ENABLED = True
 
 except:
 	lib = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_fitzhugh.so')
-	CUDA_ENABLED = False
 
 try:
 	lib_noise = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_fitzhugh_noise.so')
 	NOISE_ENABLED = True
 
 except:
-	NOISE_ENABLED = False
+        pass
 
-print '# CUDA_ENABLED', CUDA_ENABLED
+print '# CUDA_ENABLED :', CUDA_ENABLED
+print '# NOISE_ENABLED :', NOISE_ENABLED
 
 PI2 = tl.PI2
 
