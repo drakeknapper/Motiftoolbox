@@ -26,8 +26,9 @@ traces = tra.traces(system, network, info=info, position=pos_tra)
 
 torus = tor.torus(system, network, traces, info=info, position=pos_torus)
 
-system.torus = torus
+torus.vectorField_prc()
 
+system.torus = torus
 system.traces = traces
 network.system = system
 
