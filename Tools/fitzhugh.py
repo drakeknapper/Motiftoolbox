@@ -15,6 +15,13 @@ except:
 	lib = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_fitzhugh.so')
 	CUDA_ENABLED = False
 
+try:
+	lib_noise = ct.cdll.LoadLibrary(os.path.dirname(__file__)+'/lib/_fitzhugh_noise.so')
+	NOISE_ENABLED = True
+
+except:
+	NOISE_ENABLED = False
+
 print '# CUDA_ENABLED', CUDA_ENABLED
 
 PI2 = tl.PI2
@@ -83,6 +90,16 @@ def parameters_four():
 
 def parameters_n():
         return parameters_one_noise('0')
+
+
+def parameters_one_em(color='0'):
+        return np.concatenate((parameters_one(color), [params['sigma_'+color]]))
+
+def parameters_three_em():
+        return np.concatenate((parameters_three(), [params['sigma_0']]))
+
+def parameters_four_em(color='0'):
+        return np.concatenate((parameters_four(), [params['sigma_0']]))
 
 
 def setParams(**kwargs):
@@ -196,6 +213,97 @@ if CUDA_ENABLED:
 
 #=== CUDA ===#
 
+
+#=== NOISE ===#
+
+if NOISE_ENABLED:
+
+
+	lib_noise.integrate_one_em.argtypes = [ct.POINTER(ct.c_double), 
+						ct.POINTER(ct.c_double),
+						ct.POINTER(ct.c_double),
+						ct.c_double, ct.c_uint, ct.c_uint, ct.c_uint]
+	def integrate_one_em(initial_state, dt, N_integrate, stride=1, seed=42):
+
+		initial_state = np.asarray(initial_state)
+		assert initial_state.size == N_EQ1
+
+		if seed == 42:
+			np.random.seed()	# sets seed according to time (most likely)
+			seed = np.random.randint(10**8)	# find a seed from random integers
+	
+		X_out = np.zeros((N_EQ1*N_integrate), float)
+		p = parameters_one_em()
+	
+		lib_noise.integrate_one_em(initial_state.ctypes.data_as(ct.POINTER(ct.c_double)),
+					p.ctypes.data_as(ct.POINTER(ct.c_double)),
+					X_out.ctypes.data_as(ct.POINTER(ct.c_double)),
+					ct.c_double(dt), ct.c_uint(N_integrate), ct.c_uint(stride), ct.c_uint(seed))
+		return np.reshape(X_out, (N_EQ1, N_integrate), 'F')
+	
+
+	
+        lib_noise.integrate_three_em.argtypes = [ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.c_double, ct.c_uint, ct.c_uint, ct.c_uint]
+        def integrate_three_em(initial_states, coupling, dt, N_integrate, stride=1, seed=42):
+
+	        initial_states = np.asarray(initial_states) #
+	        assert initial_states.size == N_EQ3
+        
+	        coupling = np.asarray(coupling)
+	        assert coupling.size == 6
+        
+		if seed == 42:
+			np.random.seed()	# sets seed according to time (most likely)
+			seed = np.random.randint(10**8)	# find a seed from random integers
+	
+	        X_out = np.zeros((3*N_integrate), float)
+	        p = parameters_three_em()
+        
+	        lib_noise.integrate_three_em(initial_states.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        p.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        coupling.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        X_out.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        ct.c_double(dt), ct.c_uint(N_integrate), ct.c_uint(stride), ct.c_uint(seed))
+        
+	        return np.reshape(X_out, (N_integrate, 3), 'C')
+        
+
+        
+        lib_noise.integrate_four_em.argtypes = [ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.POINTER(ct.c_double),
+					        ct.c_double, ct.c_uint, ct.c_uint, ct.c_uint]
+        def integrate_four_em(initial_states, coupling, dt, N_integrate, stride=1, seed=42):
+	        initial_states = np.asarray(initial_states) #
+	        assert initial_states.size == N_EQ4
+        
+	        coupling = np.asarray(coupling)
+	        assert coupling.size == 12
+        
+		if seed == 42:
+			np.random.seed()	# sets seed according to time (most likely)
+			seed = np.random.randint(10**8)	# find a seed from random integers
+        
+	        X_out = np.zeros((4*N_integrate), float)
+	        p = parameters_four_em()
+        
+	        lib_noise.integrate_four_em(initial_states.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        p.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        coupling.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        X_out.ctypes.data_as(ct.POINTER(ct.c_double)),
+		        ct.c_double(dt), ct.c_uint(N_integrate), ct.c_uint(stride), ct.c_uint(seed))
+        
+	        return np.reshape(X_out, (N_integrate, 4), 'C')
+
+
+
+       
+#=== NOISE ===#
 
 
 lib.integrate_one_rk4_nosave.argtypes = [ct.POINTER(ct.c_double), 
@@ -445,53 +553,41 @@ if __name__ == '__main__':
 	import tools
 	import time
 
-	#createAutoCode('test.c')
-	#exit(0)
 
-        #print g_critical(I=0.5)
-        #exit(0)
-
-	dt = 0.02
-	stride = 10
-	N = 10**5
+	dt = 0.05
+	stride = 20
+	N = 10**6
 	N_initials = 100
+	coupling = 0.01*ones((12), float)
 
-	#coupling = 0.001*ones((12), float)
-	coupling = 0.001*ones((6), float)
 
-	X = array([INITIAL_ORBIT+0.3*randn(2) for i in xrange(100)])
-	plot(X[:, 1], X[:, 0], 'ko')
-	dtx, Nx = dt/float(stride), 3010*stride
-	#X = array([integrate_one_rk4_nosave(X[i], dtx, Nx) for i in xrange(100)])
-	X = cuda_integrate_one_rk4(X, dtx, Nx)
-	plot(X[:, 1], X[:, 0], 'ro')
+	params.update(sigma_0=0.01)
+	X = integrate_four_em(randn(8), coupling, dt/float(stride), N, stride)
+
+	recurrences = [tools.crossings(X[:, i], threshold=0.) for i in xrange(X.shape[1])]
+
+	t, dphi = tools.unwrapped_phase_differences(recurrences)
+
+	ax = subplot(211)
+        plot(X[:, 0], 'b-')
+        plot(X[:, 1]-1., 'g-')
+        plot(X[:, 2]-2., 'r-')
+        plot(X[:, 3]-3., 'y-')
+
+	subplot(212, sharex=ax)
+	for i in xrange(3):
+		print t, dphi[i]
+		plot(t, dphi[i], label='dphi_1%i' % (2+i))
+
+	legend()
+
+
+
+
+
+
+
+
+
 	show()
-	exit(0)
-	#print X[:, -1]
-	#plot(X[0], X[1])
-	#show()
 
-	#single_orbit(verbose=1)
-	#show()
-
-	#params.update(shift=2.)
-	#X = integrate_one_rk4(INITIAL_ORBIT, dt/float(stride), N, stride)
-	#print X[:, -1]
-	#plot(X[0], X[1])
-	#show()
-
-	X = cuda_crossing_three(randn(N_initials*N_EQ4), coupling, 0.0, 3, dt/float(stride), stride)
-	#X = cuda_integrate_four_rk4(randn(N_initials*N_EQ4), coupling, dt/float(stride), N, stride)
-        for i in xrange(X.shape[0]):
-            ti, d = tl.compute_phase_difference(transpose(X[i]))
-            tl.plot_phase_2D(d[:, 0], d[:, 1])
-        show()
-	exit(0)
-	#X = integrate_four_rk4(randn(N_EQ4), coupling, dt/float(stride), N, stride)
-
-
-	plot(X[:, 0], 'b-')
-	plot(X[:, 1]-1., 'g-')
-	plot(X[:, 2]-2., 'r-')
-	plot(X[:, 3]-3., 'y-')
-	show()

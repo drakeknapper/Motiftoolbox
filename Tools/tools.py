@@ -2,7 +2,7 @@
 
 import ctypes as ct
 import numpy as np
-from scipy.interpolate import splrep, splev
+from scipy.interpolate import splrep, splev, interp1d
 import os
 import time
 import sys
@@ -36,6 +36,35 @@ def crossings(x, threshold):
 def find_crossings(x, trigger):
 	ti = [crossings(x[j], trigger) for j in xrange(x.shape[0])]
 	return ti
+
+
+def unwrapped_phase(recurrences, times):
+        f = interp1d(recurrences, PI2*np.arange(recurrences.size))
+        return f(times)
+
+
+def unwrapped_phase_differences(recurrences, reference_index=None):
+
+        start = np.max([t_j[0] for t_j in recurrences]) # last of the first recurrence events,
+        end = np.min([t_j[-1] for t_j in recurrences])  # first of the last recurrence events:        in between, all phases can be interpolated
+
+	if reference_index == None:
+        	times = np.sort(np.concatenate(recurrences))
+        	times = times[times.searchsorted(start):times.searchsorted(end)]    # these are all times in between
+	
+	else:
+		t_j = np.asarray(recurrences[reference_index])
+		times = t_j[t_j.searchsorted(start):t_j.searchsorted(end)]
+
+        phases = np.array([unwrapped_phase(t_j, times) for t_j in recurrences])
+
+        phase_differences = np.array([phases[i]-phases[0] for i in xrange(1, len(recurrences), 1)])
+        for i in xrange(phase_differences.shape[0]):
+                phase_differences[i] -= phase_differences[i, 0]  # differences should start diffusing at zero
+
+        return times, phase_differences
+
+
 
 
 def compute_phase_difference(ti):
