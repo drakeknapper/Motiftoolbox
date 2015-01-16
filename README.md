@@ -86,7 +86,19 @@ AUTO
 -------------------------------------------
 Tools/orbit.py uses the python module of AUTO-07p to compute periodic orbits exactly.  If not installed, the orbit is approximated through a long-enough forward integration.
 
-Download AUTO-07p from http://sourceforge.net/projects/auto-07p/?source=typ_redirect and follow the directions.  Make sure to but in your .bashrc
+Download AUTO-07p from http://sourceforge.net/projects/auto-07p/?source=typ_redirect and follow the directions. 
+Open a shell and follow the following commands
+> gunzip auto-07p<..>.tar.gz
+> tar -xvf auto-07p<..>.tar
+
+A folder named auto/ is created.
+Move it to home directory and enter.
+Run configure, and install recommended package libcoin80-dev, and libsoqt-dev using package manager
+(make sure configuration recognizes fortran compiler).
+now enter into shell
+> make
+
+Make sure to but in your .bashrc
 
 > export PYTHONPATH=$PYTHONPATH:$HOME/auto/07p/python:
 > source $HOME/auto/07p/cmds/auto.env.sh
