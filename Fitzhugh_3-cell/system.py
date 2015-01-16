@@ -112,7 +112,7 @@ class system(win.window):
 		self.refresh_orbit()
 	
 	
-	def load_initial_condition(self, x, y): # only one phase:  everything's square!
+	def load_initial_condition(self, x, y):				# only one phase:  everything's square!
 		X = np.zeros((model.N_EQ3), float)
 		phi_x, phi_y = tl.PI2*(1.-x), tl.PI2*(1.-y)
 		X[::model.N_EQ1] = self.x_orbit([0., phi_x, phi_y])
@@ -120,7 +120,7 @@ class system(win.window):
 		return X
 
 
-	def load_initial_conditions(self, initial_phase): # only one phase:  everything's square!
+	def load_initial_conditions(self, initial_phase):			# only one phase:  everything's square!
 		initial_phase = np.asarray(initial_phase)
 
 		n = initial_phase.size
